@@ -34,3 +34,40 @@ class LoginTokenSerializer(TokenObtainPairSerializer):
         data['nickname'] = self.user.nickname
         data['email'] = self.user.email
         return data
+
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+# 회원 탈퇴용 시리얼라이저 (is_active만 False로 처리)
+class UserWithdrawSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = []  # 클라이언트로부터 받을 값은 없음
+
+    def update(self, instance, validated_data):
+        # 사용자 탈퇴 처리 (실제 삭제가 아니라 비활성화)
+        instance.is_active = False
+        instance.save()
+        return instance
+
+
+#유저 프로필 조회 시리얼 라이져
+class MyPageSerializer(serializers.ModelSerializer): 
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'nickname', 'profile_img', 'region', 'created_at']
+
+# 프로필 수정 시리얼 라이져
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['nickname', 'profile_img', 'region']  # 수정 가능한 항목만 ㅎ
+
+
+# 공개용 유저 프로필 조회 시리얼라이저
+class PublicUserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'nickname', 'profile_img', 'region']

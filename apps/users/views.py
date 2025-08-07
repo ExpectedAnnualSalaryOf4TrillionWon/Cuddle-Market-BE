@@ -86,3 +86,64 @@ class LogoutView(APIView):
         except TokenError:
             #  토큰이 유효하지 않은 경우 예외 처리
             return Response({"detail": "유효하지 않은 토큰입니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
+from rest_framework.permissions import IsAuthenticated
+from .Serializer import UserWithdrawSerializer
+# 회원 탈퇴 뷰 (로그인된 사용자만 요청 가능)
+class UserWithdrawView(APIView):
+    permission_classes = [IsAuthenticated]  # JWT 인증 필요
+
+    def delete(self, request):
+        user = request.user  # 현재 로그인된 사용자
+        serializer = UserWithdrawSerializer(user, data={}, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()  # is_active=False 처리
+            return Response(status=status.HTTP_204_NO_CONTENT)  # 응답: 탈퇴 완료 (내용 없음)
+
+from .Serializer import MyPageSerializer, ProfileUpdateSerializer
+# ========================
+# 📄 마이페이지 조회 뷰
+# ========================
+class MyPageView(APIView):
+    permission_classes = [IsAuthenticated]  # JWT 인증된 사용자만 접근 가능
+
+    def get(self, request):
+        # 현재 로그인된 사용자 정보를 직렬화
+        serializer = MyPageSerializer(request.user)
+        # JSON 형식으로 응답 반환
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# ==========================
+#  프로필 수정 뷰
+# ==========================
+class ProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated]  # JWT 인증된 사용자만 접근 가능
+
+    def put(self, request):
+        # 현재 사용자 + 전달받은 데이터로 시리얼라이저 초기화
+        serializer = ProfileUpdateSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()  # nickname, profile_img, region 필드 수정 반영
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        # 유효하지 않으면 오류 반환
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+from .Serializer import PublicUserProfileSerializer
+from rest_framework.generics import RetrieveAPIView
+from django.contrib.auth import get_user_model
+# ============================
+# 🔍 유저 공개 프로필 조회 뷰
+# ============================
+class UserProfileView(RetrieveAPIView):
+    User = get_user_model() #기억상 유저 정의
+    queryset = User.objects.filter(is_active=True)  # 탈퇴한 유저는 제외
+    serializer_class = PublicUserProfileSerializer
+    lookup_field = 'pk'  # URL의 <user_id> 부분을 기준으로 조회
+
+    def get(self, request, *args, **kwargs):
+        # pk로 유저 조회
+        user = self.get_object()
+        serializer = self.get_serializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
