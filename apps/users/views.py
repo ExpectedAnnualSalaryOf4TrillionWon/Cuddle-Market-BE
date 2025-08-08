@@ -134,7 +134,7 @@ from .Serializer import PublicUserProfileSerializer
 from rest_framework.generics import RetrieveAPIView
 from django.contrib.auth import get_user_model
 # ============================
-# 🔍 유저 공개 프로필 조회 뷰
+#  유저 공개 프로필 조회 뷰
 # ============================
 class UserProfileView(RetrieveAPIView):
     User = get_user_model() #기억상 유저 정의
