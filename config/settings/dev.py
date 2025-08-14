@@ -1,18 +1,17 @@
 from .base import *
-
+from datetime import timedelta
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
-# 개발 환경에서만 Swagger 활성화하거나 debug toolbar 쓸 수 있음
-INSTALLED_APPS += [
-    # 'debug_toolbar',
-    # 기타 개발용 앱
-    'rest_framework',
-    'django_filters', 
-    # 'apps.products',   
-]
+REFRESH_TOKEN_COOKIE_SECURE = False
 
-MIDDLEWARE += [
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+}

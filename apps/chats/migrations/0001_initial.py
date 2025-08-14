@@ -6,33 +6,94 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('products', '0001_initial'),
+        ("products", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ChatRoom',
+            name="ChatRoom",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='생성일')),
-                ('buyer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chatrooms_as_buyer', to=settings.AUTH_USER_MODEL, verbose_name='구매자')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chatrooms', to='products.product', verbose_name='상품')),
-                ('seller', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chatrooms_as_seller', to=settings.AUTH_USER_MODEL, verbose_name='판매자')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="생성일"),
+                ),
+                (
+                    "buyer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chatrooms_as_buyer",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="구매자",
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chatrooms",
+                        to="products.product",
+                        verbose_name="상품",
+                    ),
+                ),
+                (
+                    "seller",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chatrooms_as_seller",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="판매자",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ChatMessage',
+            name="ChatMessage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField(verbose_name='메시지 내용')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='전송 시간')),
-                ('sender', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chat_messages', to=settings.AUTH_USER_MODEL, verbose_name='발신자')),
-                ('chat_room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='chats.chatroom', verbose_name='채팅방')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.TextField(verbose_name="메시지 내용")),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="전송 시간"),
+                ),
+                (
+                    "sender",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chat_messages",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="발신자",
+                    ),
+                ),
+                (
+                    "chat_room",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="messages",
+                        to="chats.chatroom",
+                        verbose_name="채팅방",
+                    ),
+                ),
             ],
         ),
     ]

@@ -5,20 +5,55 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(choices=[('장난감', '장난감'), ('사료', '사료'), ('의류', '의류'), ('용품', '용품')], max_length=50, verbose_name='카테고리명')),
-                ('type', models.CharField(choices=[('product', '상품'), ('post', '게시글')], max_length=20, verbose_name='카테고리 유형')),
-                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='subcategories', to='categories.category', verbose_name='상위 카테고리')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        choices=[
+                            ("장난감", "장난감"),
+                            ("사료", "사료"),
+                            ("의류", "의류"),
+                            ("용품", "용품"),
+                        ],
+                        max_length=50,
+                        verbose_name="카테고리명",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[("product", "상품"), ("post", "게시글")],
+                        max_length=20,
+                        verbose_name="카테고리 유형",
+                    ),
+                ),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="subcategories",
+                        to="categories.category",
+                        verbose_name="상위 카테고리",
+                    ),
+                ),
             ],
         ),
     ]
