@@ -21,3 +21,8 @@ dev = [
     "drf-spectacular>=0.28.0",
     "ruff>=0.12.8",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"config/settings/__init__.py" = ["F403", "F405"]
+"config/settings/dev.py" = ["F403", "F405"]
+"config/settings/prod.py" = ["F403", "F405"]

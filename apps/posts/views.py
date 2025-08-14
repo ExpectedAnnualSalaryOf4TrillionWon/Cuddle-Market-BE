@@ -1,13 +1,14 @@
-from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework import status, permissions
+from rest_framework.views import APIView
+
+from .models import Comment
 from .serializers import (
     CommentCreateSerializer,
-    CommentUpdateSerializer,
     CommentListSerializer,
+    CommentUpdateSerializer,
 )
-from .models import Comment
-from django.shortcuts import get_object_or_404
 
 
 class CommentCreateView(APIView):  # 댓글 작성 전용 API 뷰

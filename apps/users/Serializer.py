@@ -1,7 +1,10 @@
 # users/serializers.py
 from rest_framework import serializers
-from .models import User
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # User 모델 기반 회원가입용 시리얼라이저 정의
 class UserSignupSerializer(serializers.ModelSerializer):
@@ -32,7 +35,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
 
 # users/serializers.py
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 
 
 class LoginTokenSerializer(TokenObtainPairSerializer):
@@ -49,9 +52,7 @@ class LoginTokenSerializer(TokenObtainPairSerializer):
         return data
 
 
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
 
 
 # 회원 탈퇴용 시리얼라이저 (is_active만 False로 처리)

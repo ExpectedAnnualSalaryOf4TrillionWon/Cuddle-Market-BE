@@ -1,11 +1,16 @@
 # users/views.py
-from rest_framework.views import APIView
+from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework import status, permissions
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.permissions import IsAuthenticated
+from .Serializer import MyPageSerializer, ProfileUpdateSerializer
+from .Serializer import UserWithdrawSerializer
+from apps.users.Serializer import UserSignupSerializer
+from django.contrib.auth import get_user_model
+from rest_framework.generics import RetrieveAPIView
 
-from apps.users.Serializer import UserSignupSerializer, LoginTokenSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-
+from .Serializer import PublicUserProfileSerializer
 
 # 회원가입을 처리하는 APIView 클래스 정의
 class SignupView(APIView):
@@ -22,59 +27,6 @@ class SignupView(APIView):
         return Response(
             serializer.errors, status=status.HTTP_400_BAD_REQUEST
         )  # 유효성 검사 실패 시 에러 반환
-
-
-class LoginTokenView(TokenObtainPairView):
-    serializer_class = LoginTokenSerializer  # 우리가 만든 커스텀 시리얼라이저 사용
-
-    def post(self, request, *args, **kwargs):
-        # 기본 JWT 로그인 로직 수행
-        serializer = self.get_serializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)  # 유효성 검사
-        except:
-            return Response(
-                {"detail": "이메일 또는 비밀번호가 올바르지 않습니다."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        # JWT 토큰 꺼내오기
-        access = serializer.validated_data.get("access")
-        refresh = serializer.validated_data.get("refresh")
-
-        # 응답 객체 생성
-        res = Response(
-            {
-                "nickname": serializer.validated_data.get("nickname"),
-                "email": serializer.validated_data.get("email"),
-            },
-            status=status.HTTP_200_OK,
-        )
-
-        # access 토큰 쿠키에 저장 (HttpOnly 옵션: 자바스크립트 접근 불가)
-        res.set_cookie(
-            key="access",  # 쿠키 이름
-            value=access,  # 쿠키에 저장할 토큰
-            httponly=True,  # JS에서 접근 못하게
-            secure=False,  # HTTPS에서만 동작하려면 True (개발 시 False)
-            samesite="Lax",  # 크로스사이트 요청 제한
-            max_age=60 * 60 * 1,  # 1시간 유지
-        )
-
-        # refresh 토큰도 쿠키에 저장 (만료 기간 더 길게)
-        res.set_cookie(
-            key="refresh",
-            value=refresh,
-            httponly=True,
-            secure=False,
-            samesite="Lax",
-            max_age=60 * 60 * 24 * 7,  # 7일 유지
-        )
-
-        return res  # 최종 응답 반환
-
-
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 
 # 로그아웃 동시에 쿠키가 블랙리스트에 들어간다음 삭제까지 로직 ~
@@ -112,10 +64,6 @@ class LogoutView(APIView):
             )
 
 
-from rest_framework.permissions import IsAuthenticated
-from .Serializer import UserWithdrawSerializer
-
-
 # 회원 탈퇴 뷰 (로그인된 사용자만 요청 가능)
 class UserWithdrawView(APIView):
     permission_classes = [IsAuthenticated]  # JWT 인증 필요
@@ -130,12 +78,6 @@ class UserWithdrawView(APIView):
             )  # 응답: 탈퇴 완료 (내용 없음)
 
 
-from .Serializer import MyPageSerializer, ProfileUpdateSerializer
-
-
-# ========================
-# 📄 마이페이지 조회 뷰
-# ========================
 class MyPageView(APIView):
     permission_classes = [IsAuthenticated]  # JWT 인증된 사용자만 접근 가능
 
@@ -145,10 +87,6 @@ class MyPageView(APIView):
         # JSON 형식으로 응답 반환
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-# ==========================
-#  프로필 수정 뷰
-# ==========================
 class ProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]  # JWT 인증된 사용자만 접근 가능
 
@@ -164,14 +102,6 @@ class ProfileUpdateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-from .Serializer import PublicUserProfileSerializer
-from rest_framework.generics import RetrieveAPIView
-from django.contrib.auth import get_user_model
-
-
-# ============================
-#  유저 공개 프로필 조회 뷰
-# ============================
 class UserProfileView(RetrieveAPIView):
     User = get_user_model()  # 기억상 유저 정의
     queryset = User.objects.filter(is_active=True)  # 탈퇴한 유저는 제외

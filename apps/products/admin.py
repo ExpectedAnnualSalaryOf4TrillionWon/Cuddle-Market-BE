@@ -20,6 +20,7 @@
 #         return obj.image_url
 
 from django.contrib import admin
+
 from .models import Product, ProductImage, ProductLike
 
 

@@ -1,5 +1,7 @@
-from .base import *
 from datetime import timedelta
+
+from .base import *
+
 DEBUG = False
 
 REFRESH_TOKEN_COOKIE_SECURE = True
