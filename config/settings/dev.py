@@ -8,6 +8,9 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS += [
     # 'debug_toolbar',
     # 기타 개발용 앱
+    'rest_framework',
+    'django_filters', 
+    # 'apps.products',   
 ]
 
 MIDDLEWARE += [
