@@ -21,8 +21,7 @@ jobs:
 
       - name: Install Packages & Libraries
         run: |
-          uv venv
-          uv pip install . --group dev
+          uv sync
 
       - name: Run ruff
         run: |
