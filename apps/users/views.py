@@ -12,6 +12,7 @@ from rest_framework.generics import RetrieveAPIView
 
 from .Serializer import PublicUserProfileSerializer
 
+
 # 회원가입을 처리하는 APIView 클래스 정의
 class SignupView(APIView):
     def post(self, request):  # POST 요청이 들어오면 실행되는 메서드
@@ -86,6 +87,7 @@ class MyPageView(APIView):
         serializer = MyPageSerializer(request.user)
         # JSON 형식으로 응답 반환
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class ProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]  # JWT 인증된 사용자만 접근 가능

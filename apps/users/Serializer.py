@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 # User 모델 기반 회원가입용 시리얼라이저 정의
 class UserSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -37,7 +38,6 @@ class UserSignupSerializer(serializers.ModelSerializer):
 # users/serializers.py
 
 
-
 class LoginTokenSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -50,9 +50,6 @@ class LoginTokenSerializer(TokenObtainPairSerializer):
         data["nickname"] = self.user.nickname
         data["email"] = self.user.email
         return data
-
-
-
 
 
 # 회원 탈퇴용 시리얼라이저 (is_active만 False로 처리)
