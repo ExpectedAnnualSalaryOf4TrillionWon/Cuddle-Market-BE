@@ -20,6 +20,11 @@ RUN /opt/venv/bin/uv pip sync uv.lock
 # Final Stage
 FROM python:3.12.6-slim
 
+ENV PYTHONUNBUFFERED=1 \
+    # 표준 출력(stdout)과 표준 에러(stderr) 스트림을 실시간으로 표시
+    PYTHONDONTWRITEBYTECODE=1
+    # .pyc 파일(바이트코드 캐시 파일)을 생성하지 않도록 설정 / 이미지 크기 최적화
+
 # 작업 디렉토리 설정
 WORKDIR /app
 
