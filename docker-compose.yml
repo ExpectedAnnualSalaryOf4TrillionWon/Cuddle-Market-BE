@@ -1,7 +1,6 @@
 services:
   django:
-    #    image: umdoong/cuddle:latest
-    image: cuddle:latest
+    image: umdoong/cuddle:latest
     container_name: django
     restart: unless-stopped
     env_file:
@@ -39,8 +38,7 @@ services:
       retries: 5
 
   nginx:
-    #    image: umdoong/cuddle_nginx:latest
-    image: cuddle_nginx:latest
+    image: umdoong/cuddle_nginx:latest
     container_name: nginx
     restart: unless-stopped
     depends_on:
@@ -60,14 +58,14 @@ services:
       - app_network
     command: nginx -g 'daemon off;' # Nginx 실행만 담당
 
-#  certbot:
-#    image: certbot/certbot
-#    container_name: certbot
-#    restart: unless-stopped
-#    volumes:
-#      - ./certbot/conf:/etc/letsencrypt
-#      - ./certbot/www:/var/www/certbot
-#    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done;'"
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done;'"
 
 volumes:
   static-:
