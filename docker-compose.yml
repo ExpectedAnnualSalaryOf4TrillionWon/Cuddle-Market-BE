@@ -1,12 +1,13 @@
 services:
   django:
-    image: umdoong/cuddle:latest
+    #    image: umdoong/cuddle:latest
+    image: cuddle:latest
     container_name: django
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.prod
+      - DJANGO_SETTINGS_MODULE=config.settings.dev
       - SECRET_KEY=${DJANGO_SECRET_KEY}
       - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
     volumes:
@@ -38,11 +39,13 @@ services:
       retries: 5
 
   nginx:
-    image: umdoong/cuddle_nginx:latest
+    #    image: umdoong/cuddle_nginx:latest
+    image: cuddle_nginx:latest
     container_name: nginx
     restart: unless-stopped
     depends_on:
-      - django
+      django:
+        condition: service_healthy
     ports:
       - "80:80"
       - "443:443"
@@ -57,14 +60,14 @@ services:
       - app_network
     command: nginx -g 'daemon off;' # Nginx 실행만 담당
 
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    # command는 외부 cron에서 실행하므로 평상시에는 아무것도 하지 않음
-    command: sleep infinity
+#  certbot:
+#    image: certbot/certbot
+#    container_name: certbot
+#    volumes:
+#      - ./certbot/conf:/etc/letsencrypt
+#      - ./certbot/www:/var/www/certbot
+#    # command는 외부 cron에서 실행하므로 평상시에는 아무것도 하지 않음
+#    command: sleep infinity
 
 volumes:
   static-:
