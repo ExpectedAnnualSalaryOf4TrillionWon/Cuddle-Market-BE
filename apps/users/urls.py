@@ -18,3 +18,4 @@ urlpatterns = [
     path("profile/", ProfileUpdateView.as_view(), name="profile-update"),  # 프로필 수정
     path("<int:pk>/profile/", UserProfileView.as_view(), name="user-profile"),  # 유저 조회(타 유저)
 ]
+#
