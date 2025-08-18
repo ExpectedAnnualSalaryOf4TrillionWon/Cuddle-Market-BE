@@ -1,11 +1,12 @@
 name: Deploy
 
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
+  push:
+#  pull_request:
+#    branches:
+#      - main
+#    types:
+#      - closed
 
 
 jobs:
@@ -41,7 +42,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_NAME }}/cuddle:latest
           docker push ${{ secrets.DOCKERHUB_NAME }}/cuddle_nginx:latest
 
-      - name: Deploy to Server NCP
+      - name: Deploy to Server EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
