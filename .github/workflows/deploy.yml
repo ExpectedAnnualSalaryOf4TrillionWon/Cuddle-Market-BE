@@ -35,12 +35,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_NAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set up QEMU for multi-platform builds
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_NAME }}/cuddle:latest .
-          docker build -t ${{ secrets.DOCKERHUB_NAME }}/cuddle_nginx:latest ./resources/nginx
-          docker push ${{ secrets.DOCKERHUB_NAME }}/cuddle:latest
-          docker push ${{ secrets.DOCKERHUB_NAME }}/cuddle_nginx:latest
+          docker buildx build --platform linux/arm64 -t ${{ secrets.DJANGO_IMAGE }} . --push
+          docker buildx build --platform linux/arm64 -t ${{ secrets.NGINX_IMAGE }} ./resources/nginx --push
+#          docker push ${{ secrets.DJANGO_IMAGE }}
+#          docker push ${{ secrets.NGINX_IMAGE }}
 
       - name: Deploy to Server EC2
         uses: appleboy/ssh-action@master
@@ -51,7 +57,7 @@ jobs:
           script: |
             docker image prune -a --filter "until=24h"
             cd app
-            docker pull ${{ secrets.DOCKERHUB_NAME }}/cuddle:latest
-            docker pull ${{ secrets.DOCKERHUB_NAME }}/cuddle_nginx:latest
+            docker pull ${{ secrets.DJANGO_IMAGE }}
+            docker pull ${{ secrets.NGINX_IMAGE }}
             docker-compose up -d --build
             docker ps
