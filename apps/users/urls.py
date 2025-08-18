@@ -2,7 +2,7 @@
 from django.urls import path
 
 from .views import (
-    LoginTokenView,
+    #LoginTokenView,
     LogoutView,
     MyPageView,
     ProfileUpdateView,
@@ -13,7 +13,7 @@ from .views import (
 
 urlpatterns = [
     path("signup/", SignupView.as_view(), name="user-signup"),  # 회원가입
-    path("login/", LoginTokenView.as_view(), name="login"),  # 로그인
+    # path("login/", LoginTokenView.as_view(), name="login"),  # 로그인
     path("logout/", LogoutView.as_view(), name="logout"),  # 로그아웃
     path("withdraw/", UserWithdrawView.as_view(), name="user-withdraw"),  # 회원탈퇴
     path("mypage/", MyPageView.as_view(), name="mypage"),  # 마이 페이지 조회(본인)

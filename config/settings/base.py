@@ -53,7 +53,6 @@ THIRD_PARTY_APPS = [
     "apps.users",
     "apps.products",
     "apps.categories",
-    "apps.posts",
     "apps.likes",
     "apps.chats",
     "drf_spectacular",

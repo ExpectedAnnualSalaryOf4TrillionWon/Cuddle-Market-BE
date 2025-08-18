@@ -1,47 +1,53 @@
-from django.conf import settings
 from django.db import models
+from django.conf import settings
+from apps.products.models import Product
 
 
+# 채팅방 테이블
 class ChatRoom(models.Model):
+    id = models.BigAutoField(primary_key=True)  # 채팅방 ID
     buyer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="chatrooms_as_buyer",
-        verbose_name="구매자",
-    )
+        related_name="chatrooms_as_buyer"
+    )  # 구매자
     seller = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="chatrooms_as_seller",
-        verbose_name="판매자",
-    )
+        related_name="chatrooms_as_seller"
+    )  # 판매자
     product = models.ForeignKey(
-        "products.Product",
+        Product,
         on_delete=models.CASCADE,
-        related_name="chatrooms",
-        verbose_name="상품",
-    )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성일")
+        related_name="chatrooms"
+    )  # 대상 상품
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일시
+
+    class Meta:
+        db_table = "chat_room"
 
     def __str__(self):
-        return f"ChatRoom (상품: {self.product.id}, {self.buyer.nickname} ↔ {self.seller.nickname})"
+        return f"ChatRoom {self.id} - {self.product.title}"
 
 
+# 채팅 메시지 테이블
 class ChatMessage(models.Model):
+    id = models.BigAutoField(primary_key=True)  # 메시지 ID
     chat_room = models.ForeignKey(
         ChatRoom,
         on_delete=models.CASCADE,
-        related_name="messages",
-        verbose_name="채팅방",
-    )
+        related_name="messages"
+    )  # 채팅방
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="chat_messages",
-        verbose_name="발신자",
-    )
-    content = models.TextField(verbose_name="메시지 내용")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="전송 시간")
+        related_name="sent_messages"
+    )  # 발신자
+    message = models.CharField(max_length=1000, null=False)  # 메시지 내용
+    created_at = models.DateTimeField(auto_now_add=True)  # 발신 시간
+
+    class Meta:
+        db_table = "chat_message"
 
     def __str__(self):
-        return f"[{self.chat_room.id}] {self.sender.nickname}: {self.content[:20]}"
+        return f"{self.sender} in {self.chat_room.id}: {self.message[:20]}"

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Product, ProductImage, ProductLike
+from .models import Product, ProductImage
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -11,7 +11,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductLikeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductLike
+        #   model = 
         fields = ["id", "user", "product", "created_at"]
         read_only_fields = ["id", "created_at"]
 

@@ -1,196 +1,89 @@
-# from django.db import models
-# from django.conf import settings
-
-
-# class Product(models.Model):
-#     class StatusChoices(models.TextChoices):
-#         SELLING = '판매중', '판매중'
-#         RESERVED = '예약중', '예약중'
-#         SOLD = '판매완료', '판매완료'
-
-#     class TypeChoices(models.TextChoices):
-#         SELL = 'sell', '판매'
-#         BUY = 'buy', '구매'
-
-#     user = models.ForeignKey(
-#         settings.AUTH_USER_MODEL,
-#         on_delete=models.CASCADE,
-#         related_name='products',
-#         verbose_name='등록한 사용자'
-#     )
-#     post = models.ForeignKey(
-#         'posts.Post',
-#         on_delete=models.CASCADE,
-#         related_name='products',
-#         verbose_name='연결된 게시글'
-#     )
-#     category = models.ForeignKey(
-#         'categories.Category',
-#         on_delete=models.SET_NULL,
-#         null=True,
-#         related_name='products',
-#         verbose_name='카테고리'
-#     )
-#     price = models.PositiveIntegerField(verbose_name='가격')
-#     status = models.CharField(
-#         max_length=10,
-#         choices=StatusChoices.choices,
-#         default=StatusChoices.SELLING,
-#         verbose_name='거래 상태'
-#     )
-#     type = models.CharField(
-#         max_length=10,
-#         choices=TypeChoices.choices,
-#         verbose_name='게시글 유형'
-#     )
-#     location = models.CharField(
-#         max_length=100,
-#         blank=True,
-#         verbose_name='지역 필터용'
-#     )
-#     method = models.CharField(
-#         max_length=20,
-#         choices=[('직거래', '직거래'), ('택배', '택배')],
-#         blank=True,
-#         verbose_name='거래 방식'
-#     )
-#     is_deleted = models.BooleanField(default=False, verbose_name='삭제 여부')
-#     created_at = models.DateTimeField(auto_now_add=True, verbose_name='등록일')
-
-#     def __str__(self):
-#         return f"{self.post.title} - {self.price}원"
-
-
-# class ProductImage(models.Model):
-#     product = models.ForeignKey(
-#         Product,
-#         on_delete=models.CASCADE,
-#         related_name='images',
-#         verbose_name='상품'
-#     )
-#     image_url = models.URLField(verbose_name='이미지 URL')
-
-#     def __str__(self):
-#         return f"Product {self.product.id}의 이미지"
-
-
-# class ProductLike(models.Model):
-#     product = models.ForeignKey(
-#         Product,
-#         on_delete=models.CASCADE,
-#         related_name='product_likes',  # 충돌 방지를 위해 변경됨
-#         verbose_name='좋아요 상품'
-#     )
-#     user = models.ForeignKey(
-#         settings.AUTH_USER_MODEL,
-#         on_delete=models.CASCADE,
-#         related_name='liked_products',
-#         verbose_name='좋아요 누른 사용자'
-#     )
-#     created_at = models.DateTimeField(auto_now_add=True, verbose_name='좋아요 누른 시각')
-
-#     class Meta:
-#         unique_together = ('product', 'user')
-#         verbose_name = '상품 좋아요'
-#         verbose_name_plural = '상품 좋아요 목록'
-
-#     def __str__(self):
-#         return f"{self.user} likes {self.product}"
-
-
-"""
-구분선
-
-"""
-
-from django.conf import settings
 from django.db import models
+from django.conf import settings   # AUTH_USER_MODEL (커스텀 유저) 참조할 때 필요
 
 
+# 반려동물 종류 테이블 (예: 포유류, 조류 등)
+class PetType(models.Model):
+    code = models.CharField(max_length=50, unique=True, null=False)  # 고유 코드 (예: "MAMMAL01")
+    name = models.CharField(max_length=100, null=False)  # 종류명 (예: 포유류)
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일 (자동 기록)
+    updated_at = models.DateTimeField(auto_now=True)      # 수정일 (자동 기록)
+
+    def __str__(self):
+        return self.name   # admin 등에서 표시될 때 이름 반환
+
+
+# 반려동물 상세 종류 테이블 (예: 강아지, 고양이 등)
+class PetTypeDetail(models.Model):
+    pet_type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name="details")  
+    # → PetType과 1:N 관계 (예: 포유류 → 강아지/고양이)
+    code = models.CharField(max_length=50, unique=True, null=False)  # 상세 코드 (예: "DOG01")
+    name = models.CharField(max_length=100, null=False)  # 상세명 (예: 강아지)
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일
+    updated_at = models.DateTimeField(auto_now=True)      # 수정일
+
+    def __str__(self):
+        return f"{self.pet_type.name} - {self.name}"  # 예: "포유류 - 강아지"
+
+
+# 상품 테이블
 class Product(models.Model):
-    class StatusChoices(models.TextChoices):
-        SELLING = "판매중", "판매중"
-        RESERVED = "예약중", "예약중"
-        SOLD = "판매완료", "판매완료"
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="products")  
+    # → 상품 작성자 (User)와 연결, 유저 삭제 시 상품도 같이 삭제됨
 
-    class TypeChoices(models.TextChoices):
-        SELL = "sell", "판매"
-        BUY = "buy", "구매"
+    # ERD에서 code 값으로만 저장하는 필드들 (FK 아님, 문자열 그대로 저장)
+    state_code = models.CharField(max_length=50, null=True, blank=True)       # 등록 지역 (시/도) 코드
+    city_code = models.CharField(max_length=50, null=True, blank=True)        # 등록 지역 (시/군/구) 코드
+    category_code = models.CharField(max_length=50, null=True, blank=True)    # 카테고리 코드
+    pet_type_code = models.CharField(max_length=50, null=True, blank=True)    # 반려동물 종류 코드
+    pet_type_detail_code = models.CharField(max_length=50, null=True, blank=True)  # 반려동물 상세 종류 코드
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # 사용자 모델 유지
-        on_delete=models.CASCADE,
-        related_name="products",
-        verbose_name="등록한 사용자",
-    )
-    # post 필드 임시 주석 처리
-    # post = models.ForeignKey(
-    #     'posts.Post',
-    #     on_delete=models.CASCADE,
-    #     related_name='products',
-    #     verbose_name='연결된 게시글'
-    # )
+    # 상품 정보
+    title = models.CharField(max_length=50, null=False)  # 상품 제목
+    description = models.TextField(max_length=500, blank=True, null=True)  # 상품 설명 (선택)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=False)  # 상품 가격 (최대 99999999.99)
 
-    # category FK 대신 CharField 로 변경
-    category = models.CharField(
-        max_length=50, blank=True, null=True, verbose_name="카테고리"
-    )
+    # 거래 상태 (enum 대응)
+    TRANSACTION_CHOICES = [
+        ("SELLING", "판매중"),
+        ("RESERVED", "예약중"),
+        ("SOLD", "판매완료"),
+    ]
+    transaction_status = models.CharField(
+        max_length=10, choices=TRANSACTION_CHOICES, default="SELLING"
+    )  # 기본값은 판매중
 
-    price = models.PositiveIntegerField(verbose_name="가격")
-    status = models.CharField(
-        max_length=10,
-        choices=StatusChoices.choices,
-        default=StatusChoices.SELLING,
-        verbose_name="거래 상태",
-    )
-    type = models.CharField(
-        max_length=10, choices=TypeChoices.choices, verbose_name="게시글 유형"
-    )
-    location = models.CharField(max_length=100, blank=True, verbose_name="지역 필터용")
-    method = models.CharField(
-        max_length=20,
-        choices=[("직거래", "직거래"), ("택배", "택배")],
-        blank=True,
-        verbose_name="거래 방식",
-    )
-    is_deleted = models.BooleanField(default=False, verbose_name="삭제 여부")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="등록일")
+    # 상품 상태 
+    CONDITION_CHOICES = [
+        ("NEW", "새상품"),
+        ("LIKE_NEW", "거의 새것"),
+        ("USED", "사용감 있음"),
+        ("NEEDS_REPAIR", "수리 필요"),
+    ]
+    condition_status = models.CharField(
+        max_length=15, choices=CONDITION_CHOICES, null=True, blank=True
+    )  # 상품 상태 (선택)
+
+    # 조회수
+    view_count = models.BigIntegerField(default=0)  # 기본 0회
+
+    # 생성/수정 시간
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일
+    updated_at = models.DateTimeField(auto_now=True)      # 수정일
 
     def __str__(self):
-        return f"{self.category} - {self.price}원"  # post.title 대신 category 로 대체
+        return f"[{self.id}] {self.title} - {self.price}원"  # admin 등에서 보기 좋게 출력
 
 
+# 상품 이미지 테이블
 class ProductImage(models.Model):
-    product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="images", verbose_name="상품"
-    )
-    image_url = models.URLField(verbose_name="이미지 URL")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")  
+    # → 하나의 상품에 여러 이미지 연결 가능
+    url = models.URLField(max_length=255)  # 이미지 경로 (URL 저장)
+    is_main = models.BooleanField(default=False)  # 대표 이미지 여부 (True/False)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)  
+    # → 업로더 유저 (삭제되면 null 처리)
+    uploaded_at = models.DateTimeField(auto_now_add=True)  # 업로드 시각
 
     def __str__(self):
-        return f"Product {self.product.id}의 이미지"
-
-
-class ProductLike(models.Model):
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name="product_likes",
-        verbose_name="좋아요 상품",
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="liked_products",
-        verbose_name="좋아요 누른 사용자",
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name="좋아요 누른 시각"
-    )
-
-    class Meta:
-        unique_together = ("product", "user")
-        verbose_name = "상품 좋아요"
-        verbose_name_plural = "상품 좋아요 목록"
-
-    def __str__(self):
-        return f"{self.user} likes {self.product}"
+        return f"Image for {self.product.title}"  # admin 표시용
