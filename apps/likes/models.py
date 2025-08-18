@@ -8,14 +8,14 @@ class ProductLike(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        primary_key=False,   # PK는 따로 지정하지 않음 (아래에서 복합키로 처리)
+        related_name="likes"   
     )
     # → 찜한 사용자 (회원 삭제되면 찜 기록도 삭제됨)
 
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        primary_key=False,   # 동일
+        related_name="likes"   # 동일
     )
     # → 찜한 상품 (상품 삭제되면 찜 기록도 삭제됨)
 

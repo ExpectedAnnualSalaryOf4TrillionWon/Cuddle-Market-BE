@@ -5,7 +5,7 @@ from apps.products.models import Product
 
 # 채팅방 테이블
 class ChatRoom(models.Model):
-    id = models.BigAutoField(primary_key=True)  # 채팅방 ID
+
     buyer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
