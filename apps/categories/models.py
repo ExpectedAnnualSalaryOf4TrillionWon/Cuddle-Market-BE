@@ -1,31 +1,15 @@
 from django.db import models
 
-
 class Category(models.Model):
-    class CategoryName(models.TextChoices):
-        TOY = "장난감", "장난감"
-        FOOD = "사료", "사료"
-        CLOTHES = "의류", "의류"
-        SUPPLIES = "용품", "용품"
+    id = models.AutoField(primary_key=True)  # 고유 ID (자동 증가)
+    code = models.CharField(max_length=50, unique=True, null=False)  # 카테고리 코드 (예: "CAT001")
+    name = models.CharField(max_length=100, null=False)  # 카테고리 이름 (예: 간식/사료, 장난감)
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일 (자동 기록)
+    updated_at = models.DateTimeField(auto_now=True)  # 수정일 (자동 기록)
 
-    class CategoryType(models.TextChoices):
-        PRODUCT = "product", "상품"
-        POST = "post", "게시글"
-
-    name = models.CharField(
-        max_length=50, choices=CategoryName.choices, verbose_name="카테고리명"
-    )
-    type = models.CharField(
-        max_length=20, choices=CategoryType.choices, verbose_name="카테고리 유형"
-    )
-    parent = models.ForeignKey(
-        "self",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="subcategories",
-        verbose_name="상위 카테고리",
-    )
+    class Meta:
+        db_table = "category"  # DB 테이블명 지정
 
     def __str__(self):
-        return f"{self.get_type_display()} - {self.get_name_display()}"
+        return f"{self.name} ({self.code})"
+

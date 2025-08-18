@@ -1,49 +1,81 @@
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    BaseUserManager,
-    PermissionsMixin,
-)
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 
 
+# 커스텀 User를 만들 때 필요한 매니저 클래스
 class UserManager(BaseUserManager):
-    # 일반 사용자 생성 메서드
+    # 일반 유저 생성 메서드
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError("이메일은 필수 항목입니다.")
-        email = self.normalize_email(email)  # 이메일 정규화
-        user = self.model(email=email, **extra_fields)  # 유저 인스턴스 생성
+            raise ValueError("Email must be set")  # 이메일 필수
+        email = self.normalize_email(email)  # 이메일 포맷 정규화 (대소문자 정리 등)
+        user = self.model(email=email, **extra_fields)  # User 객체 생성
         user.set_password(password)  # 비밀번호 해싱 처리
         user.save(using=self._db)  # DB에 저장
         return user
 
-    # 관리자(superuser) 생성 메서드
-    def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault("is_staff", True)  # 관리자 권한 부여
-        extra_fields.setdefault("is_superuser", True)  # 슈퍼유저 권한 부여
+    # 슈퍼유저 생성 메서드
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)  # 관리자 권한
+        extra_fields.setdefault("is_superuser", True)  # 슈퍼유저 권한
         return self.create_user(email, password, **extra_fields)
 
 
-#  커스텀 User 모델 정의
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)  # 로그인 ID로 사용할 이메일
-    password = models.CharField(max_length=128)  # 비밀번호 (set_password로 해싱됨)
-    nickname = models.CharField(max_length=20)  # 닉네임
-    profile_img = models.URLField(blank=True, null=True)  # 프로필 이미지
-    region = models.CharField(max_length=50, blank=True, null=True)  # 지역
-
-    is_active = models.BooleanField(default=True)  # 탈퇴 여부 (soft delete 용)
-    is_staff = models.BooleanField(default=False)  # 관리자 페이지 접속 권한
-
-    created_at = models.DateTimeField(auto_now_add=True)  # 생성일
-    updated_at = models.DateTimeField(auto_now=True)  # 수정일
-
-    # 커스텀 매니저 연결
-    objects = UserManager()
-
-    # 로그인 시 사용할 필드 설정
-    USERNAME_FIELD = "email"  # 기본 유저 모델의 username 대신 email 사용
-    REQUIRED_FIELDS = ["nickname"]  # createsuperuser 시 추가로 입력받을 필드
+# 시/도 테이블 (서울특별시, 경기도 등)
+class State(models.Model):
+    code = models.CharField(max_length=50, unique=True)  # 코드값 (예: "11")
+    name = models.CharField(max_length=50)  # 이름 (예: 서울특별시)
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일시
+    updated_at = models.DateTimeField(auto_now=True)  # 수정일시
 
     def __str__(self):
-        return self.email  # User 인스턴스를 문자열로 표현할 때 이메일 반환
+        return self.name
+
+
+# 시/군/구 테이블 (강남구, 수원시 등)
+class City(models.Model):
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name="cities")  
+    # -> State와 1:N 관계 (서울특별시 → 강남구 등)
+    code = models.CharField(max_length=50, unique=True)  # 코드값 (예: "1101")
+    name = models.CharField(max_length=50)  # 이름 (예: 강남구)
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일시
+    updated_at = models.DateTimeField(auto_now=True)  # 수정일시
+
+    def __str__(self):
+        return f"{self.state.name} {self.name}"
+
+
+# 사용자 테이블
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)  # 로그인 이메일 (고유)
+    provider = models.CharField(max_length=20, blank=True, null=True)  
+    # -> 소셜 로그인 제공자 (google, kakao, naver 등)
+    provider_id = models.CharField(max_length=255, blank=True, null=True)  
+    # -> 소셜 로그인에서 제공하는 사용자 고유 ID
+    nickname = models.CharField(max_length=8)  # 닉네임
+    name = models.CharField(max_length=30, blank=True, null=True)  # 이름 (선택)
+    profile_image = models.URLField(max_length=255, blank=True, null=True)  
+    # -> 프로필 사진 URL
+    birthday = models.DateField(blank=True, null=True)  # 생일 (선택)
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True)  
+    # -> 사용자의 기본 거주 시/도
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)  
+    # -> 사용자의 기본 거주 시/군/구
+
+    # 권한 관련 필드
+    is_active = models.BooleanField(default=True)  # 계정 활성화 여부
+    is_superuser = models.BooleanField(default=False)  # 슈퍼유저 권한 여부
+    is_staff = models.BooleanField(default=False)  # 관리자 페이지 접근 권한 여부
+
+    # 생성/수정 시간
+    created_at = models.DateTimeField(auto_now_add=True)  # 가입일
+    updated_at = models.DateTimeField(auto_now=True)  # 정보 수정일
+
+    # 로그인에 사용할 필드 (USERNAME_FIELD는 email 사용)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []  # createsuperuser 할 때 추가로 입력받을 필드 없음
+
+    objects = UserManager()  # 커스텀 매니저 연결
+
+    def __str__(self):
+        return self.email  # admin 페이지 등에서 이메일로 표시
