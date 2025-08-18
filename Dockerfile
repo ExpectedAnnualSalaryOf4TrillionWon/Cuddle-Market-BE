@@ -1,4 +1,4 @@
-FROM python:3.12.6-slim AS builder
+FROM --platform=linux/arm64 python:3.12.6-slim AS builder
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
@@ -20,7 +20,7 @@ COPY pyproject.toml uv.lock ./
 RUN /bin/bash -c "source /opt/venv/bin/activate && uv sync"
 
 # Final Stage
-FROM python:3.12.6-slim
+FROM --platform=linux/arm64 python:3.12.6-slim
 
 ENV PYTHONUNBUFFERED=1 \
     # 표준 출력(stdout)과 표준 에러(stderr) 스트림을 실시간으로 표시
