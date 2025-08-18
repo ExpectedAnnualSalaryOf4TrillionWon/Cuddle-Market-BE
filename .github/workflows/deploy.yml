@@ -43,8 +43,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker buildx build --platform linux/arm64 -t ${{ secrets.DJANGO_IMAGE }} . --push
-          docker buildx build --platform linux/arm64 -t ${{ secrets.NGINX_IMAGE }} ./resources/nginx --push
+          docker buildx build -t ${{ secrets.DJANGO_IMAGE }} . --push
+          docker buildx build -t ${{ secrets.NGINX_IMAGE }} ./resources/nginx --push
 
       - name: Deploy to Server EC2
         uses: appleboy/ssh-action@master
@@ -57,5 +57,4 @@ jobs:
             cd app
             docker pull ${{ secrets.DJANGO_IMAGE }}
             docker pull ${{ secrets.NGINX_IMAGE }}
-            docker-compose up -d
-            docker ps
+            docker-compose up -d --build
