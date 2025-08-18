@@ -35,3 +35,27 @@ class PetTypeDetail(models.Model):
 
     def __str__(self):
         return f"{self.pet_type.name} - {self.name}"  # 예: "포유류 - 강아지"
+
+
+# 시/도 테이블 (서울특별시, 경기도 등)
+class State(models.Model):
+    code = models.CharField(max_length=50, unique=True)  # 코드값 (예: "11")
+    name = models.CharField(max_length=50)  # 이름 (예: 서울특별시)
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일시
+    updated_at = models.DateTimeField(auto_now=True)  # 수정일시
+
+    def __str__(self):
+        return self.name
+
+
+# 시/군/구 테이블 (강남구, 수원시 등)
+class City(models.Model):
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name="cities")
+    # -> State와 1:N 관계 (서울특별시 → 강남구 등)
+    code = models.CharField(max_length=50, unique=True)  # 코드값 (예: "1101")
+    name = models.CharField(max_length=50)  # 이름 (예: 강남구)
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일시
+    updated_at = models.DateTimeField(auto_now=True)  # 수정일시
+
+    def __str__(self):
+        return f"{self.state.name} {self.name}"

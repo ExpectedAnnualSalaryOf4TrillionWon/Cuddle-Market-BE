@@ -29,6 +29,8 @@ services:
     image: redis:7-alpine # 특정 버전 명시
     container_name: redis
     restart: unless-stopped
+    volumes:
+      - redis-data:/data
     networks:
       - app_network
     healthcheck:
@@ -69,6 +71,7 @@ services:
 
 volumes:
   static-:
+  redis-data:
 
 networks:
   app_network:
