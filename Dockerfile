@@ -1,4 +1,7 @@
-FROM python:3.12.6-slim as builder
+FROM python:3.12.6-slim AS builder
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
@@ -14,8 +17,7 @@ COPY pyproject.toml uv.lock ./
 
 # 가상 환경에 의존성 설치
 # lock 파일이 변경될 때만 이 레이어가 재실행됩니다.
-RUN /opt/venv/bin/uv pip sync uv.lock
-
+RUN /bin/bash -c "source /opt/venv/bin/activate && uv sync"
 
 # Final Stage
 FROM python:3.12.6-slim
@@ -28,17 +30,19 @@ ENV PYTHONUNBUFFERED=1 \
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 런타임에 필요한 시스템 의존성만 설치 (용량이 작은 libpq5 사용)
-RUN apt-get update && apt-get install -y libpq5 && rm -rf /var/lib/apt/lists/*
+# 런타임에 필요한 시스템 의존성만 설치 (용량이 작은 libpq5 사용), health check용 curl 설치
+RUN apt-get update && apt-get install -y \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Builder 스테이지에서 생성한 가상환경을 통째로 복사
-COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /app/.venv /app/.venv
+
+ENV PATH="/app/.venv/bin:$PATH"
 
 # 나머지 소스 코드를 복사
 COPY . .
-
-# 가상환경을 활성화하도록 PATH 설정
-ENV PATH="/opt/venv/bin:$PATH"
 
 # 포트 노출
 EXPOSE 8000
