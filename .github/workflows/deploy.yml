@@ -71,6 +71,5 @@ jobs:
           script: |
             docker image prune -a --filter "until=6h"
             cd app
-            docker pull $DJANGO_IMAGE
-            docker pull $NGINX_IMAGE
+            DJANGO_IMAGE=$DJANGO_IMAGE NGINX_IMAGE=$NGINX_IMAGE docker-compose pull
             DJANGO_IMAGE=$DJANGO_IMAGE NGINX_IMAGE=$NGINX_IMAGE docker-compose up -d --force-recreate
