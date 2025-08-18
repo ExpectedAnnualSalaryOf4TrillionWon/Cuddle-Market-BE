@@ -51,9 +51,13 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            docker image prune -a --filter "until=6h"
-            cd app
-            docker pull ${{ secrets.DJANGO_IMAGE }}
-            docker pull ${{ secrets.NGINX_IMAGE }}
-            docker-compose up -d --build
+          envs: DJANGO_IMAGE,NGINX_IMAGE  # 환경변수 전달
+        env:
+          DJANGO_IMAGE: ${{ secrets.DJANGO_IMAGE }}
+          NGINX_IMAGE: ${{ secrets.NGINX_IMAGE }}
+        script: |
+          docker image prune -a --filter "until=6h"
+          cd app
+          docker pull $DJANGO_IMAGE
+          docker pull $NGINX_IMAGE
+          DJANGO_IMAGE=$DJANGO_IMAGE NGINX_IMAGE=$NGINX_IMAGE docker-compose up -d --force-recreate
