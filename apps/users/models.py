@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 
+from apps.categories.models import State, City
+
 
 # 커스텀 User를 만들 때 필요한 매니저 클래스
 class UserManager(BaseUserManager):
@@ -21,30 +23,6 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-# 시/도 테이블 (서울특별시, 경기도 등)
-class State(models.Model):
-    code = models.CharField(max_length=50, unique=True)  # 코드값 (예: "11")
-    name = models.CharField(max_length=50)  # 이름 (예: 서울특별시)
-    created_at = models.DateTimeField(auto_now_add=True)  # 생성일시
-    updated_at = models.DateTimeField(auto_now=True)  # 수정일시
-
-    def __str__(self):
-        return self.name
-
-
-# 시/군/구 테이블 (강남구, 수원시 등)
-class City(models.Model):
-    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name="cities")  
-    # -> State와 1:N 관계 (서울특별시 → 강남구 등)
-    code = models.CharField(max_length=50, unique=True)  # 코드값 (예: "1101")
-    name = models.CharField(max_length=50)  # 이름 (예: 강남구)
-    created_at = models.DateTimeField(auto_now_add=True)  # 생성일시
-    updated_at = models.DateTimeField(auto_now=True)  # 수정일시
-
-    def __str__(self):
-        return f"{self.state.name} {self.name}"
-
-
 # 사용자 테이블
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)  # 로그인 이메일 (고유)
@@ -52,7 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # -> 소셜 로그인 제공자 (google, kakao, naver 등)
     provider_id = models.CharField(max_length=255, blank=True, null=True)  
     # -> 소셜 로그인에서 제공하는 사용자 고유 ID
-    nickname = models.CharField(max_length=8)  # 닉네임
+    nickname = models.CharField(max_length=8, null=False)  # 닉네임
     name = models.CharField(max_length=30, blank=True, null=True)  # 이름 (선택)
     profile_image = models.URLField(max_length=255, blank=True, null=True)  
     # -> 프로필 사진 URL

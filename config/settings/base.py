@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-
+import redis
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -164,3 +164,10 @@ CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://api.umdoong.shop"]
 CORS_ALLOW_CREDENTIALS = True  # 쿠키를 포함한 요청 허용
 CORS_ALLOWED_METHODS = ["GET", "POST", "DELETE", "PUT", "PATCH"]
 CORS_ALLOWED_HEADERS = ["Content-Type", "Authorization"]
+
+REDIS_CLIENT = redis.StrictRedis(
+    host=os.getenv("REDIS_HOST"),
+    port=6379,
+    db=0,
+    decode_responses=True,  # 문자열 반환을 위해 decode_responses=True 설정
+)

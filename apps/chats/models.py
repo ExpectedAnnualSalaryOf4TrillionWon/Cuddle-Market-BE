@@ -5,7 +5,6 @@ from apps.products.models import Product
 
 # 채팅방 테이블
 class ChatRoom(models.Model):
-
     buyer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -32,7 +31,6 @@ class ChatRoom(models.Model):
 
 # 채팅 메시지 테이블
 class ChatMessage(models.Model):
-    id = models.BigAutoField(primary_key=True)  # 메시지 ID
     chat_room = models.ForeignKey(
         ChatRoom,
         on_delete=models.CASCADE,
