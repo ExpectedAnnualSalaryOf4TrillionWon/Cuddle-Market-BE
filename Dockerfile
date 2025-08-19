@@ -11,16 +11,13 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && pip install uv
 
-RUN uv venv /opt/venv
-
 COPY pyproject.toml uv.lock ./
 
 # 가상 환경에 의존성 설치
-# lock 파일이 변경될 때만 이 레이어가 재실행됩니다.
-RUN /bin/bash -c "source /opt/venv/bin/activate && uv sync"
+RUN uv sync --frozen
 
 # Final Stage
-FROM python:3.12.6-slim
+FROM python:3.12.6
 
 ENV PYTHONUNBUFFERED=1 \
     # 표준 출력(stdout)과 표준 에러(stderr) 스트림을 실시간으로 표시
