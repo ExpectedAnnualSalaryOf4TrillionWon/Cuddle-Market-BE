@@ -1,26 +1,39 @@
 from django.db import models
-from django.conf import settings   # AUTH_USER_MODEL (커스텀 유저) 참조할 때 필요
-
-
-
+from django.conf import settings  # AUTH_USER_MODEL (커스텀 유저) 참조할 때 필요
 
 
 # 상품 테이블
 class Product(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="products")  
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="products"
+    )
     # → 상품 작성자 (User)와 연결, 유저 삭제 시 상품도 같이 삭제됨
 
     # ERD에서 code 값으로만 저장하는 필드들 (FK 아님, 문자열 그대로 저장)
-    state_code = models.CharField(max_length=50, null=True, blank=True)       # 등록 지역 (시/도) 코드
-    city_code = models.CharField(max_length=50, null=True, blank=True)        # 등록 지역 (시/군/구) 코드
-    category_code = models.CharField(max_length=50, null=True, blank=True)    # 카테고리 코드
-    pet_type_code = models.CharField(max_length=50, null=True, blank=True)    # 반려동물 종류 코드
-    pet_type_detail_code = models.CharField(max_length=50, null=True, blank=True)  # 반려동물 상세 종류 코드
+    state_code = models.CharField(
+        max_length=50, null=True, blank=True
+    )  # 등록 지역 (시/도) 코드
+    city_code = models.CharField(
+        max_length=50, null=True, blank=True
+    )  # 등록 지역 (시/군/구) 코드
+    category_code = models.CharField(
+        max_length=50, null=True, blank=True
+    )  # 카테고리 코드
+    pet_type_code = models.CharField(
+        max_length=50, null=True, blank=True
+    )  # 반려동물 종류 코드
+    pet_type_detail_code = models.CharField(
+        max_length=50, null=True, blank=True
+    )  # 반려동물 상세 종류 코드
 
     # 상품 정보
     title = models.CharField(max_length=50, null=False)  # 상품 제목
-    description = models.TextField(max_length=500, blank=True, null=True)  # 상품 설명 (선택)
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=False)  # 상품 가격 (최대 99999999.99)
+    description = models.TextField(
+        max_length=500, blank=True, null=True
+    )  # 상품 설명 (선택)
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=False
+    )  # 상품 가격 (최대 99999999.99)
 
     # 거래 상태 (enum 대응)
     TRANSACTION_CHOICES = [
@@ -32,12 +45,12 @@ class Product(models.Model):
         max_length=10, choices=TRANSACTION_CHOICES, default="SELLING"
     )  # 기본값은 판매중
 
-    # 상품 상태 
+    # 상품 상태
     CONDITION_CHOICES = [
-        ("NEW", "새상품"),
-        ("LIKE_NEW", "거의 새것"),
-        ("USED", "사용감 있음"),
-        ("NEEDS_REPAIR", "수리 필요"),
+        ("MINT", "새상품"),
+        ("EXCELLENT", "거의 새것"),
+        ("GOOD", "사용감 있음"),
+        ("FAIR", "수리 필요"),
     ]
     condition_status = models.CharField(
         max_length=15, choices=CONDITION_CHOICES, null=True, blank=True
@@ -48,19 +61,25 @@ class Product(models.Model):
 
     # 생성/수정 시간
     created_at = models.DateTimeField(auto_now_add=True)  # 생성일
-    updated_at = models.DateTimeField(auto_now=True)      # 수정일
+    updated_at = models.DateTimeField(auto_now=True)  # 수정일
 
     def __str__(self):
-        return f"[{self.id}] {self.title} - {self.price}원"  # admin 등에서 보기 좋게 출력
+        return (
+            f"[{self.id}] {self.title} - {self.price}원"  # admin 등에서 보기 좋게 출력
+        )
 
 
 # 상품 이미지 테이블
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")  
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="images"
+    )
     # → 하나의 상품에 여러 이미지 연결 가능
     url = models.URLField(max_length=255)  # 이미지 경로 (URL 저장)
     is_main = models.BooleanField(default=False)  # 대표 이미지 여부 (True/False)
-    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)  
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
     # → 업로더 유저 (삭제되면 null 처리)
     uploaded_at = models.DateTimeField(auto_now_add=True)  # 업로드 시각
 

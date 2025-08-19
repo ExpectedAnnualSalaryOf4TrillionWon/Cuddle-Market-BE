@@ -11,7 +11,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductLikeSerializer(serializers.ModelSerializer):
     class Meta:
-        #   model = 
+        #   model =
         fields = ["id", "user", "product", "created_at"]
         read_only_fields = ["id", "created_at"]
 

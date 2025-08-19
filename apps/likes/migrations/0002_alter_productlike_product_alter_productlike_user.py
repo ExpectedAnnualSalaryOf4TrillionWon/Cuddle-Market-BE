@@ -6,22 +6,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('likes', '0001_initial'),
-        ('products', '0003_remove_pettypedetail_pet_type_delete_pettype_and_more'),
+        ("likes", "0001_initial"),
+        ("products", "0003_remove_pettypedetail_pet_type_delete_pettype_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='productlike',
-            name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='likes', to='products.product'),
+            model_name="productlike",
+            name="product",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="likes",
+                to="products.product",
+            ),
         ),
         migrations.AlterField(
-            model_name='productlike',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='likes', to=settings.AUTH_USER_MODEL),
+            model_name="productlike",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="likes",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

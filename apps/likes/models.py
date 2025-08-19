@@ -6,16 +6,14 @@ from apps.products.models import Product
 # 상품 찜(Like) 테이블
 class ProductLike(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="likes"   
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="likes"
     )
     # → 찜한 사용자 (회원 삭제되면 찜 기록도 삭제됨)
 
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name="likes"   # 동일
+        related_name="likes",  # 동일
     )
     # → 찜한 상품 (상품 삭제되면 찜 기록도 삭제됨)
 

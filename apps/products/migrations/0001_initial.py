@@ -5,60 +5,133 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='PetType',
+            name="PetType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(max_length=50, unique=True)),
-                ('name', models.CharField(max_length=100)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("code", models.CharField(max_length=50, unique=True)),
+                ("name", models.CharField(max_length=100)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Product',
+            name="Product",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('state_code', models.CharField(blank=True, max_length=50, null=True)),
-                ('city_code', models.CharField(blank=True, max_length=50, null=True)),
-                ('category_code', models.CharField(blank=True, max_length=50, null=True)),
-                ('pet_type_code', models.CharField(blank=True, max_length=50, null=True)),
-                ('pet_type_detail_code', models.CharField(blank=True, max_length=50, null=True)),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField(blank=True, max_length=500, null=True)),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('transaction_status', models.CharField(choices=[('SELLING', '판매중'), ('RESERVED', '예약중'), ('SOLD', '판매완료')], default='SELLING', max_length=10)),
-                ('condition_status', models.CharField(blank=True, choices=[('NEW', '새상품'), ('LIKE_NEW', '거의 새것'), ('USED', '사용감 있음'), ('NEEDS_REPAIR', '수리 필요')], max_length=15, null=True)),
-                ('view_count', models.BigIntegerField(default=0)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("state_code", models.CharField(blank=True, max_length=50, null=True)),
+                ("city_code", models.CharField(blank=True, max_length=50, null=True)),
+                (
+                    "category_code",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                (
+                    "pet_type_code",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                (
+                    "pet_type_detail_code",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                ("title", models.CharField(max_length=50)),
+                (
+                    "description",
+                    models.TextField(blank=True, max_length=500, null=True),
+                ),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "transaction_status",
+                    models.CharField(
+                        choices=[
+                            ("SELLING", "판매중"),
+                            ("RESERVED", "예약중"),
+                            ("SOLD", "판매완료"),
+                        ],
+                        default="SELLING",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "condition_status",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("NEW", "새상품"),
+                            ("LIKE_NEW", "거의 새것"),
+                            ("USED", "사용감 있음"),
+                            ("NEEDS_REPAIR", "수리 필요"),
+                        ],
+                        max_length=15,
+                        null=True,
+                    ),
+                ),
+                ("view_count", models.BigIntegerField(default=0)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='ProductImage',
+            name="ProductImage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(max_length=255)),
-                ('is_main', models.BooleanField(default=False)),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("url", models.URLField(max_length=255)),
+                ("is_main", models.BooleanField(default=False)),
+                ("uploaded_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='PetTypeDetail',
+            name="PetTypeDetail",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(max_length=50, unique=True)),
-                ('name', models.CharField(max_length=100)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('pet_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='details', to='products.pettype')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("code", models.CharField(max_length=50, unique=True)),
+                ("name", models.CharField(max_length=100)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "pet_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="details",
+                        to="products.pettype",
+                    ),
+                ),
             ],
         ),
     ]
