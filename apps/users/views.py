@@ -19,6 +19,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class RedisKeys:
     """
     KAKAO_ACCESS_TOKEN: 카카오에서 발급받은 엑세스 토큰 cache
@@ -139,7 +140,6 @@ class KakaoAuthView(APIView):
 
         try:
             kakao_access_token = token_response.json().get("access_token")
-            kakao_refresh_token = token_response.json().get("refresh_token")
 
         except Exception:
             return Response(
@@ -160,28 +160,33 @@ class KakaoAuthView(APIView):
 
         kakao_user_info = user_info_response.json()
         kakao_id = kakao_user_info.get("id")
-        kakao_email = (kakao_account := kakao_user_info.get("kakao_account")) and kakao_account.get("email")
+        kakao_email = (
+            kakao_account := kakao_user_info.get("kakao_account")
+        ) and kakao_account.get("email")
         # X and Y / X가 Falsy하면 Y는 쳐다도 안봄, X가 Truthy면 Y도 평가
 
         if not kakao_id:
             return Response(
-                {"error": "provider_id가 없습니다."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "provider_id가 없습니다."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         if not kakao_email:
             return Response(
-                {"error": "kakao email을 가져오지 못했습니다."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "kakao email을 가져오지 못했습니다."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         with transaction.atomic():
             try:
                 user = User.objects.get(provider="KAKAO", provider_id=kakao_id)
             except User.DoesNotExist:
-
                 if User.objects.filter(email=kakao_email).exists():
                     return Response(
-                        {"error": "해당 이메일은 이미 다른 계정으로 가입되어 있습니다."},
-                        status=status.HTTP_400_BAD_REQUEST
+                        {
+                            "error": "해당 이메일은 이미 다른 계정으로 가입되어 있습니다."
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
                     )
 
                 user = User.objects.create(
@@ -193,7 +198,7 @@ class KakaoAuthView(APIView):
                 )
 
         user.last_login = timezone.now()
-        user.save(update_fields=['last_login'])
+        user.save(update_fields=["last_login"])
 
         # Redis에 카카오 토큰 저장
         REDIS_CLIENT.setex(
@@ -273,6 +278,7 @@ class LogoutView(APIView):
     """
     로그아웃 API
     """
+
     @extend_schema(
         summary="로그아웃",
         description="refresh token을 blacklist에 등록 후 로그아웃하는 API입니다",
@@ -296,13 +302,17 @@ class LogoutView(APIView):
         except Exception:
             return Response(
                 {"error": "로그아웃 처리 중 서버 오류가 발생했습니다."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        if getattr(request.user, "provider", None) == "KAKAO" and getattr(request.user, "provider_id", None):
+        if getattr(request.user, "provider", None) == "KAKAO" and getattr(
+            request.user, "provider_id", None
+        ):
             self._logout_kakao(request.user.provider_id)
 
-        response = Response({"detail": "성공적으로 로그아웃되었습니다."}, status=status.HTTP_200_OK)
+        response = Response(
+            {"detail": "성공적으로 로그아웃되었습니다."}, status=status.HTTP_200_OK
+        )
         response.delete_cookie("refresh_token")
 
         try:
@@ -323,14 +333,16 @@ class LogoutView(APIView):
         :return:
         """
 
-        kakao_access_token = REDIS_CLIENT.get(RedisKeys.get_kakao_access_token_key(provider_id))
+        kakao_access_token = REDIS_CLIENT.get(
+            RedisKeys.get_kakao_access_token_key(provider_id)
+        )
 
         if not kakao_access_token:
             return
 
         # Redis에서 가져온 값은 bytes일 수 있으므로 디코딩
         if isinstance(kakao_access_token, bytes):
-            kakao_access_token = kakao_access_token.decode('utf-8')
+            kakao_access_token = kakao_access_token.decode("utf-8")
 
         kakao_logout_url = "https://kapi.kakao.com/v1/user/logout"
         headers = {"Authorization": f"Bearer {kakao_access_token}"}

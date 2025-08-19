@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
     일반적인 사용자 정보 조회를 위한 시리얼라이저
     """
+
     state_name = serializers.CharField(source="state.name", read_only=True)
     city_name = serializers.CharField(source="city.name", read_only=True)
 
@@ -43,17 +44,14 @@ class SocialProfileRegistrationSerializer(serializers.ModelSerializer):
     # 1. state 필드를 SlugRelatedField로 변경
     state = serializers.SlugRelatedField(
         queryset=State.objects.all(),  # 이 이름으로 객체를 찾을 DB 테이블
-        slug_field='name',  # 'name' 필드를 기준으로 찾고, 보여줌
+        slug_field="name",  # 'name' 필드를 기준으로 찾고, 보여줌
         allow_null=True,  # null 값을 허용
-        required=False  # 필수 입력이 아님
+        required=False,  # 필수 입력이 아님
     )
 
     # 2. city 필드도 SlugRelatedField로 변경
     city = serializers.SlugRelatedField(
-        queryset=City.objects.all(),
-        slug_field='name',
-        allow_null=True,
-        required=False
+        queryset=City.objects.all(), slug_field="name", allow_null=True, required=False
     )
 
     class Meta:
@@ -79,7 +77,9 @@ class SocialProfileRegistrationSerializer(serializers.ModelSerializer):
         """
         # value는 사용자가 입력한 생년월일 값입니다.
         if value > date.today():
-            raise serializers.ValidationError("생년월일은 오늘 날짜보다 미래일 수 없습니다.")
+            raise serializers.ValidationError(
+                "생년월일은 오늘 날짜보다 미래일 수 없습니다."
+            )
         return value
 
     def update(self, instance, validated_data):
