@@ -310,9 +310,7 @@ class LogoutView(APIView):
         ):
             self._logout_kakao(request.user.provider_id)
 
-        response = Response(
-            {"detail": "성공적으로 로그아웃되었습니다."}, status=status.HTTP_200_OK
-        )
+        response = Response(status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie("refresh_token")
 
         try:
