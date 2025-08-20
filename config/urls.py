@@ -10,8 +10,9 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/users/", include("apps.users.urls")),
-    # path("api/products/", include("apps.products.urls")),
+    path("api/v1/users/", include("apps.users.urls")),
+    # path("api/v1/products/", include("apps.products.urls")),
+    path("api/v1/categories/", include("apps.categories.urls")),
 ]
 
 if settings.DEBUG:

@@ -1,10 +1,11 @@
 from django.urls import path
-
+from django.conf import settings
 from .views import (
     KakaoAuthView,
     TokenRefreshView,
     SocialProfileRegistrationView,
     LogoutView,
+    DevLoginView,
 )
 
 urlpatterns = [
@@ -17,3 +18,10 @@ urlpatterns = [
     ),
     path("logout/", LogoutView.as_view(), name="logout"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += path(
+        "dev-login/",
+        DevLoginView.as_view(),
+        name="swagger-ui",
+    )
