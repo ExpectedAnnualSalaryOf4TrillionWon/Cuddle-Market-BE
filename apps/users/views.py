@@ -12,10 +12,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from apps.users.serializers import UserSerializer, SocialProfileRegistrationSerializer
+from apps.users.serializers import (
+    UserSerializer,
+    SocialProfileRegistrationSerializer,
+    DevLoginSerializer,
+)
 from config.settings.base import KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, REDIS_CLIENT
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 
 User = get_user_model()
 
@@ -354,3 +358,63 @@ class LogoutView(APIView):
         except requests.RequestException as e:
             # 네트워크 에러 등
             raise RuntimeError(f"Kakao logout network error: {e}")
+
+
+class DevLoginView(APIView):
+    authentication_classes = ()
+    permission_classes = (AllowAny,)
+
+    @extend_schema(
+        request=DevLoginSerializer,
+        responses={
+            200: dict,
+            401: dict,
+        },
+        summary="로그인",
+        description="이메일과 비밀번호로 사용자를 인증하여 JWT 토큰을 발급합니다.",
+    )
+    def post(self, request) -> Response:
+        email = request.data.get("email")
+        if not email:
+            return Response(
+                {"detail": "이메일을 입력하세요"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        password = request.data.get("password")
+        if not password:
+            return Response(
+                {"detail": "비밀번호를 입력하세요"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        user = authenticate(email=email, password=password)
+
+        if not User.objects.filter(email=email).exists():
+            return Response(
+                {"detail": "존재하지 않는 이메일입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if user is None:
+            return Response(
+                {"detail": "잘못된 비밀번호입니다."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        refresh = RefreshToken.for_user(user)  # JWT token 생성
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        user_data = User.objects.get(email=email)
+        serializer = UserSerializer(user_data)
+
+        # access token 은 JSON 응답으로 반환
+        response = Response(
+            {"access_token": access_token, "user": serializer.data},
+            status=status.HTTP_200_OK,
+        )
+        # refresh token 은 httpOnly, secure cookie 에 저장
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,  # 자바스크립트에서 접근 불가능하게 설정
+            secure=settings.REFRESH_TOKEN_COOKIE_SECURE,  # True: HTTPS 환경에서만 쿠키가 전송되도록 함
+            samesite="Strict",  # 같은 사이트에서만 쿠키 전송
+        )
+        return response
