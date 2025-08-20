@@ -1,4 +1,8 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    BaseUserManager,
+)
 from django.db import models
 
 from apps.categories.models import State, City
@@ -25,22 +29,18 @@ class UserManager(BaseUserManager):
 
 # 사용자 테이블
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)  # 로그인 이메일 (고유)
-    provider = models.CharField(max_length=20, blank=True, null=True)  
-    # -> 소셜 로그인 제공자 (google, kakao, naver 등)
-    provider_id = models.CharField(max_length=255, blank=True, null=True)  
-    # -> 소셜 로그인에서 제공하는 사용자 고유 ID
-    nickname = models.CharField(max_length=8, null=False)  # 닉네임
-    name = models.CharField(max_length=30, blank=True, null=True)  # 이름 (선택)
-    profile_image = models.URLField(max_length=255, blank=True, null=True)  
-    # -> 프로필 사진 URL
-    birthday = models.DateField(blank=True, null=True)  # 생일 (선택)
-    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True)  
-    # -> 사용자의 기본 거주 시/도
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)  
-    # -> 사용자의 기본 거주 시/군/구
+    email = models.EmailField(unique=True)
+    provider = models.CharField(max_length=20, blank=True, null=True)
+    provider_id = models.CharField(max_length=255, blank=True, null=False)
+    nickname = models.CharField(max_length=8, null=False)
+    name = models.CharField(max_length=30, blank=True, null=True)
+    profile_image = models.URLField(max_length=255, blank=True, null=True)
+    birthday = models.DateField(blank=True, null=True)
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
 
     # 권한 관련 필드
+    profile_completed = models.BooleanField(default=False)  # 추가 정보 입력 확인
     is_active = models.BooleanField(default=True)  # 계정 활성화 여부
     is_superuser = models.BooleanField(default=False)  # 슈퍼유저 권한 여부
     is_staff = models.BooleanField(default=False)  # 관리자 페이지 접근 권한 여부
