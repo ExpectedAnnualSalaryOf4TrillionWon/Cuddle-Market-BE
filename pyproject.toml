@@ -30,3 +30,6 @@ dev = [
 "config/settings/__init__.py" = ["F403", "F405"]
 "config/settings/dev.py" = ["F403", "F405"]
 "config/settings/prod.py" = ["F403", "F405"]
+
+[tool.ruff]
+ignore = ["E402"]

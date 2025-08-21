@@ -23,9 +23,8 @@ from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.dev')
 django.setup()
-
-from apps.chats.middleware import JWTAuthMiddleware   #  django.setup() 이후에 import
-import apps.chats.routing                             #  django.setup() 이후에 import
+from apps.chats.middleware import JWTAuthMiddleware  # noqa: E402
+import apps.chats.routing  # noqa: E402
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
