@@ -57,6 +57,7 @@ THIRD_PARTY_APPS = [
     "apps.chats",
     "drf_spectacular",
     "corsheaders",
+    "channels",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
@@ -137,7 +138,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = "/app/staticfiles"
+STATIC_ROOT = "staticfiles" 
+# "/app/staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -175,3 +177,20 @@ REDIS_CLIENT = redis.StrictRedis(
     db=0,
     decode_responses=True,  # 문자열 반환을 위해 decode_responses=True 설정
 )
+
+# 레디스 주소
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],  # Redis 주소
+        },
+    },
+}
+
+ASGI_APPLICATION = 'config.asgi.application'
+
+SIMPLE_JWT = {
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+}

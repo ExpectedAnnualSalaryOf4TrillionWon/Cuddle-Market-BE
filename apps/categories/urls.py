@@ -1,13 +1,6 @@
 # product/urls.py
+from django.urls import path
 
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from apps.categories.views import AllCategoryDataAPIView
 
-from .views import ProductViewSet
-
-router = DefaultRouter()
-router.register(r"products", ProductViewSet)
-
-urlpatterns = [
-    path("", include(router.urls)),
-]
+urlpatterns = [path("all-get", AllCategoryDataAPIView.as_view(), name="all-get")]

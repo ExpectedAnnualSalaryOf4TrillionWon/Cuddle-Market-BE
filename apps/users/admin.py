@@ -1,37 +1,43 @@
-from typing import Any
-
 from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
-from django.forms import ModelForm
-from django.http import HttpRequest
-
-User = get_user_model()
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import User
 
 
-# Register your models here.
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    # 표시할 컬럼
-    list_display = ("email", "nickname", "is_staff", "is_active", "is_superuser")
-    # 검색 기능 설정
-    search_fields = ("email", "nickname")
-    # 필터링 조건
+class UserAdmin(BaseUserAdmin):
+    list_display = (
+        "id", 
+        "email", 
+        "nickname", 
+        "is_active", 
+        "is_staff", 
+        "is_superuser", 
+        "created_at",  # date_joined 대신 created_at 사용
+    )
     list_filter = ("is_active", "is_staff", "is_superuser")
+    search_fields = ("email", "nickname")
+    ordering = ("-id",)
+    readonly_fields = ("created_at", "updated_at", "last_login")  # 이 줄 추가
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        ("개인정보", {"fields": ("nickname", "name", "profile_image", "birthday", "state", "city")}),
+        ("권한", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        ("상태", {"fields": ("profile_completed",)}),
+        ("중요 일자", {"fields": ("last_login", "created_at", "updated_at")}),
+    )
 
-    def get_form(self, request: Any, obj: User = None, **kwargs: Any):
-        form = super().get_form(request, obj, **kwargs)
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": (
+                "email",
+                "nickname",
+                "password1",
+                "password2",
+                "is_active",
+                "is_staff",
+                "is_superuser",
+            ),
+        }),
+    )
 
-        if not request.user.is_superuser:
-            form.base_fields["is_superuser"].disabled = True
-            form.base_fields["is_staff"].disabled = True
-        return form
-
-    # 유저 생성 시 비밀번호 해쉬화
-    def save_model(
-        self, request: HttpRequest, obj: User, form: ModelForm, change: bool
-    ) -> None:
-        if obj.password:
-            obj.password = make_password(obj.password)
-
-        super().save_model(request, obj, form, change)

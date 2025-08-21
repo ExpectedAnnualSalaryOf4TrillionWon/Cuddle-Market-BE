@@ -20,8 +20,10 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += path(
-        "dev-login/",
-        DevLoginView.as_view(),
-        name="swagger-ui",
+    urlpatterns += (
+        path(
+            "dev-login/",
+            DevLoginView.as_view(),
+            name="swagger-ui",
+        ),
     )
