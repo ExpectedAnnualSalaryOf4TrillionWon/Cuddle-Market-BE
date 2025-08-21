@@ -1,6 +1,6 @@
 from django.urls import path
 from django.conf import settings
-from .views import (
+from .views.auth import (
     KakaoAuthView,
     TokenRefreshView,
     SocialProfileRegistrationView,

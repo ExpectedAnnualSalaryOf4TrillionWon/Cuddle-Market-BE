@@ -256,61 +256,43 @@ class Command(BaseCommand):
             "JEJU": ["제주시", "서귀포시"],
         }
 
-        total_created_count = 0
-        total_skipped_count = 0
+        # 1. 성능 최적화: 필요한 모든 State 객체를 한 번의 쿼리로 미리 가져옵니다.
+        # 이렇게 하면 루프 안에서 매번 DB에 접근하는 것을 방지합니다 (N+1 문제 해결).
+        states_map = {state.code: state for state in State.objects.all()}
 
-        # items()를 사용하여 State 코드와 City 이름 리스트를 순회합니다.
+        # 생성, 업데이트, 건너뜀 카운터 초기화
+        created_count = 0
+        updated_count = 0
+        skipped_count = 0
+
         for state_code, city_names in all_cities_data.items():
-            try:
-                # 1. City 데이터의 부모가 될 State 객체를 먼저 찾습니다.
-                state_obj = State.objects.get(code=state_code)
-            except State.DoesNotExist:
-                self.stdout.write(
-                    self.style.WARNING(
-                        f"State '{state_code}'을(를) 찾을 수 없습니다. 이 시/도의 City 데이터는 건너뜁니다."
-                    )
-                )
-                total_skipped_count += len(city_names)
-                continue  # 다음 State로 넘어갑니다.
+            state_obj = states_map.get(state_code)
 
-            state_created_count = 0
-            # 2. 해당 State에 속한 City들을 하나씩 생성합니다.
+            # 2. 미리 가져온 맵에서 State 객체를 찾지 못하면 건너뜁니다.
+            if not state_obj:
+                self.stdout.write(
+                    self.style.WARNING(f"State '{state_code}'을(를) 찾을 수 없습니다. 이 시/도의 City 데이터는 건너뜁니다.")
+                )
+                skipped_count += len(city_names)
+                continue
+
             for index, city_name in enumerate(city_names, 1):
-                # City 코드를 'STATE코드-순번' 형태로 생성합니다. (예: SEOUL-01, SEOUL-02)
-                city_code = f"{state_code}-{index:02}"  # 01, 02, ... 형태로 포맷팅, 최소 2자리 너비, 너비가 부족하면 남는 공간은 0으로
+                city_code = f"{state_code}-{index:02}"
 
-                obj, created = City.objects.get_or_create(
+                _, created = City.objects.update_or_create(
                     code=city_code,
-                    defaults={
-                        "name": city_name,
-                        "state": state_obj,  # ForeignKey 관계 설정
-                    },
+                    defaults={"name": city_name, "state": state_obj},
                 )
 
+                # 3. 생성과 업데이트를 구분하여 카운터 증가
                 if created:
-                    state_created_count += 1
+                    created_count += 1
+                else:
+                    updated_count += 1
 
-            if state_created_count > 0:
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"'{state_obj.name}'에 {state_created_count}개의 시/군/구 데이터를 성공적으로 추가했습니다."
-                    )
-                )
-
-            total_created_count += state_created_count
-
+        # 4. 최종 요약 메시지를 정확하게 출력
         self.stdout.write("-" * 50)
-        if total_created_count > 0:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"총 {total_created_count}개의 새로운 시/군/구 데이터가 추가되었습니다."
-                )
-            )
-        if total_skipped_count > 0:
-            self.stdout.write(
-                self.style.WARNING(
-                    f"총 {total_skipped_count}개의 시/군/구 데이터는 부모 시/도를 찾지 못해 건너뛰었습니다."
-                )
-            )
-
-        self.stdout.write(self.style.SUCCESS("모든 작업이 완료되었습니다."))
+        self.stdout.write(self.style.SUCCESS("작업 요약:"))
+        self.stdout.write(f"- 시/군/구 데이터: {created_count}개 생성, {updated_count}개 업데이트 완료.")
+        if skipped_count > 0:
+            self.stdout.write(self.style.WARNING(f"- 총 {skipped_count}개의 시/군/구 데이터는 부모 시/도를 찾지 못해 건너뛰었습니다."))
