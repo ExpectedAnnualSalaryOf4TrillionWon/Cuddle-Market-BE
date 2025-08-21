@@ -29,24 +29,22 @@ class Command(BaseCommand):
             {"code": "SEJONG", "name": "세종특별자치시"},
         ]
 
+        # 생성 및 업데이트 카운터 초기화
         created_count = 0
+        updated_count = 0
+
         for state_info in states_data:
-            # get_or_create: code가 이미 존재하면 가져오고, 없으면 새로 생성합니다.
-            # 이 방법을 사용하면 스크립트를 여러 번 실행해도 데이터가 중복으로 쌓이지 않습니다.
-            obj, created = State.objects.get_or_create(
+            _, created = State.objects.update_or_create(
                 code=state_info["code"], defaults={"name": state_info["name"]}
             )
 
+            # 2. 생성과 업데이트를 구분하여 카운터 증가
             if created:
                 created_count += 1
-                self.stdout.write(
-                    self.style.SUCCESS(f"'{state_info['name']}' 생성 완료")
-                )
             else:
-                self.stdout.write(f"'{state_info['name']}'은(는) 이미 존재합니다.")
+                updated_count += 1
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"총 {created_count}개의 시/도 데이터가 성공적으로 추가되었습니다."
-            )
-        )
+        # 3. 최종 요약 메시지를 명확하게 출력
+        self.stdout.write("-" * 50)
+        self.stdout.write(self.style.SUCCESS("작업 요약:"))
+        self.stdout.write(f"- 시/도 데이터: {created_count}개 생성, {updated_count}개 업데이트 완료.")
