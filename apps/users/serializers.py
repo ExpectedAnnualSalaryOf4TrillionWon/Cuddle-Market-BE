@@ -96,3 +96,8 @@ class SocialProfileRegistrationSerializer(serializers.ModelSerializer):
         instance.save(update_fields=["profile_completed"] + list(validated_data.keys()))
 
         return instance
+
+
+class DevLoginSerializer(serializers.Serializer[None]):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)

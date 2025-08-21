@@ -12,10 +12,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from apps.users.serializers import UserSerializer, SocialProfileRegistrationSerializer
+from apps.users.serializers import (
+    UserSerializer,
+    SocialProfileRegistrationSerializer,
+    DevLoginSerializer,
+)
 from config.settings.base import KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, REDIS_CLIENT
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 
 User = get_user_model()
 
@@ -354,3 +358,161 @@ class LogoutView(APIView):
         except requests.RequestException as e:
             # 네트워크 에러 등
             raise RuntimeError(f"Kakao logout network error: {e}")
+
+# class WithdrawalView(APIView):
+#     """
+#     회원탈퇴 API
+#     """
+#
+#     @extend_schema(
+#         summary="회원탈퇴",
+#         description="유저를 soft delete로 관리하는 회원탈퇴 API입니다",
+#         tags=["User"],
+#     )
+#     def delete(self, request):
+#         user = request.user
+#         # 소셜 유저라면 소셜 로그인을 먼저 끊어주기 위한 if문
+#         if user.provider_id is not None:
+#             try:
+#                 # 엑세스토큰 refresh 요청
+#                 kakao_refresh_url = "https://kauth.kakao.com/oauth/token"
+#                 data = {
+#                     "grant_type": "refresh_token",
+#                     "client_id": KAKAO_CLIENT_ID,
+#                     "refresh_token": REDIS_CLIENT.get(
+#                         RedisKeys.get_kakao_refresh_token_key(request.user.provider_id)
+#                     ),
+#                 }
+#                 token_response = requests.post(kakao_refresh_url, data=data)
+#                 if token_response.status_code != 200:
+#                     return Response(
+#                         {"error": "카카오 토큰 재발급에 실패했습니다."},
+#                         status=status.HTTP_400_BAD_REQUEST,
+#                     )
+#
+#                 # 카카오 연결 끊기
+#                 unlink_url = "https://kapi.kakao.com/v1/user/unlink"
+#                 kakao_access_token = token_response.json()["access_token"]
+#                 headers = {"Authorization": f"Bearer {kakao_access_token}"}
+#                 response = requests.post(unlink_url, headers=headers)
+#                 if response.status_code != 200:
+#                     return Response(
+#                         {"error": "카카오 계정 연결 해제 실패"},
+#                         status=status.HTTP_400_BAD_REQUEST,
+#                     )
+#
+#             except Exception:
+#                 return Response(
+#                     {
+#                         "error": "소셜 계정 연결 해제 중 오류 발생, 관리자에게 문의해주세요"
+#                     },
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
+#
+#         # 쿠키에서 refresh token 추출
+#         refresh_token = request.COOKIES.get("refresh_token")
+#         if refresh_token:
+#             try:
+#                 token = RefreshToken(refresh_token)
+#                 token.blacklist()
+#             except Exception:
+#                 return Response(
+#                     {"error": "관리자에게 문의해주세요"},
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
+#
+#         # 소프트 삭제하기 전에 닉네임 중복 방지를 위해 uuid로 랜덤한 값을 넣어줌
+#         # 17자 이상이면 데이터를 보관하기 보다는 문제를 야기시킬 수 있는 확률을 제거하도록 로직 설정
+#         if len(user.nickname) >= 17 or len(user.phone_number) >= 17:
+#             user.nickname = uuid.uuid4().hex[:10]
+#             user.phone_number = uuid.uuid4().hex[:10]
+#         else:
+#             user.nickname = (
+#                 user.nickname + " / " + uuid.uuid4().hex[: 17 - len(user.nickname)]
+#             )
+#             user.phone_number = (
+#                 user.phone_number
+#                 + " / "
+#                 + uuid.uuid4().hex[: 17 - len(user.phone_number)]
+#             )
+#         user.is_active = False
+#         user.save()
+#
+#         # soft delete 처리
+#         user.delete()
+#
+#         # refresh token 삭제 후 응답 반환
+#         response = Response(
+#             {
+#                 "detail": "회원 탈퇴가 완료되었습니다. 같은 이메일로 재가입해도 데이터는 남아있지 않습니다."
+#             },
+#             status=status.HTTP_200_OK,
+#         )
+#         response.delete_cookie("refresh_token")
+#         # 소셜로그인 캐시 정보 삭제
+#         REDIS_CLIENT.delete(
+#             RedisKeys.get_kakao_refresh_token_key(request.user.provider_id)
+#         )
+#         REDIS_CLIENT.delete(
+#             RedisKeys.get_kakao_access_token_key(request.user.provider_id)
+#         )
+#         return response
+
+class DevLoginView(APIView):
+    authentication_classes = ()
+    permission_classes = (AllowAny,)
+
+    @extend_schema(
+        request=DevLoginSerializer,
+        responses={
+            200: dict,
+            401: dict,
+        },
+        summary="로그인",
+        description="이메일과 비밀번호로 사용자를 인증하여 JWT 토큰을 발급합니다.",
+    )
+    def post(self, request) -> Response:
+        email = request.data.get("email")
+        if not email:
+            return Response(
+                {"detail": "이메일을 입력하세요"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        password = request.data.get("password")
+        if not password:
+            return Response(
+                {"detail": "비밀번호를 입력하세요"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        user = authenticate(email=email, password=password)
+
+        if not User.objects.filter(email=email).exists():
+            return Response(
+                {"detail": "존재하지 않는 이메일입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if user is None:
+            return Response(
+                {"detail": "잘못된 비밀번호입니다."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        refresh = RefreshToken.for_user(user)  # JWT token 생성
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        user_data = User.objects.get(email=email)
+        serializer = UserSerializer(user_data)
+
+        # access token 은 JSON 응답으로 반환
+        response = Response(
+            {"access_token": access_token, "user": serializer.data},
+            status=status.HTTP_200_OK,
+        )
+        # refresh token 은 httpOnly, secure cookie 에 저장
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,  # 자바스크립트에서 접근 불가능하게 설정
+            secure=settings.REFRESH_TOKEN_COOKIE_SECURE,  # True: HTTPS 환경에서만 쿠키가 전송되도록 함
+            samesite="Strict",  # 같은 사이트에서만 쿠키 전송
+        )
+        return response

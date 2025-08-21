@@ -167,7 +167,7 @@ CORS_ALLOWED_METHODS = ["GET", "POST", "DELETE", "PUT", "PATCH"]
 CORS_ALLOWED_HEADERS = ["Content-Type", "Authorization"]
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", f"https://{DOMAIN_NAME}"]
-CSRF_COOKIE_DOMAIN = (os.getenv("COOKIE_DOMAIN"))
+CSRF_COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
 
 REDIS_CLIENT = redis.StrictRedis(
     host=os.getenv("REDIS_HOST"),
