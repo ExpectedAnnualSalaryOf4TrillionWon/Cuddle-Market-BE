@@ -38,7 +38,7 @@ class ChatRoomListCreateView(APIView):
         )
     
 
-class ChatRoomDeleteView(APIView):
+class ChatRoomDeleteView(APIView): # 채팅방 삭제 기능 
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, chatroom_id):

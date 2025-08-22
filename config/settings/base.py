@@ -58,6 +58,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "corsheaders",
     "channels",
+    "daphne",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
@@ -168,11 +169,11 @@ CORS_ALLOW_CREDENTIALS = True  # 쿠키를 포함한 요청 허용
 CORS_ALLOWED_METHODS = ["GET", "POST", "DELETE", "PUT", "PATCH"]
 CORS_ALLOWED_HEADERS = ["Content-Type", "Authorization"]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", f"https://{DOMAIN_NAME}"]
-CSRF_COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
+#CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", f"https://{DOMAIN_NAME}","http://127.0.0.1"]
+#CSRF_COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
 
 REDIS_CLIENT = redis.StrictRedis(
-    host=os.getenv("REDIS_HOST"),
+    host=os.getenv("REDIS_HOST", "127.0.0.1"),
     port=6379,
     db=0,
     decode_responses=True,  # 문자열 반환을 위해 decode_responses=True 설정
@@ -183,7 +184,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],  # Redis 주소
+            'hosts': [(os.getenv("REDIS_HOST", "127.0.0.1"), 6379)],  # Redis 주소
         },
     },
 }
