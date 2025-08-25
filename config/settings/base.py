@@ -38,6 +38,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 DJANGO_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -58,7 +59,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "corsheaders",
     "channels",
-    "daphne",
+    
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
