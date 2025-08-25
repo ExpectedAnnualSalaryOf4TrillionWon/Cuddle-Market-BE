@@ -44,5 +44,15 @@ class AllCategoryDataAPIView(APIView):
             "petTypes": pet_types_data,
             # "locations": locations_data,
         }
+        # {
+        #     "petTypes": {
+        #         "code": ,
+        #         "name": ,
+        #         "details": {
+        #             "code": ,
+        #             "name": ,
+        #         }
+        #     }
+        # }
 
         return Response(response_data)
