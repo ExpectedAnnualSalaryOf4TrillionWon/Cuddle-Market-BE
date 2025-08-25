@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import LikeAPIView
+from .views import ProductLikeToggleAPIView, ProductLikeCountView
 
-urlspatterns = [
-    path('', LikeAPIView.as_view(), name='likes'),
+urlpatterns = [
+    path("", ProductLikeToggleAPIView.as_view(), name="likes"),
+    path("<int:pk>/count/", ProductLikeCountView.as_view(), name="product-like-count"),
 ]

@@ -1,64 +1,88 @@
 from rest_framework import serializers
-from apps.likes.models import Like
+from apps.likes.models import ProductLike
 from apps.products.models import Product
+from django.db import IntegrityError
 
-class LikeCreateSerializer(serializers.ModelSerializer):
-    # 찜 등록용 시리얼라이저
+
+class ProductLikeSerializer(serializers.ModelSerializer):
+    # 요청에서는 product_id 사용
+    product_id = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(), source="product", write_only=True
+    )
 
     class Meta:
-        model = Like
-        fields = ['Product_id']
+        model = ProductLike
+        fields = ["product_id"]
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        product = validated_data["product"]
+
+        # 중복 방지
+        if ProductLike.objects.filter(user=user, product=product).exists():
+            raise IntegrityError("이미 관심 상품으로 추가된 상품입니다.")
+
+        return ProductLike.objects.create(user=user, product=product)
+
+    def to_representation(self, instance):
+        """
+        응답을 명세서 형식에 맞게 변경
+        """
+        return {
+            "message": "관심 목록에 추가되었습니다.",
+            "product_id": instance.product.id,
+            "is_liked": True,
+        }
+
+
+class LikeListSerializer(serializers.ModelSerializer):
+    # 찜 목록 조회용 시리얼라이저
+    product_id = serializers.IntegerField(source="product.id")
+    title = serializers.CharField(source="product.title")
+    price = serializers.DecimalField(
+        source="product.price", max_digits=10, decimal_places=2
+    )
+    view_count = serializers.IntegerField(source="product.view_count")
+    transaction_status = serializers.CharField(source="product.transaction_status")
+    thumbnail = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductLike
+        fields = (
+            "product_id",
+            "title",
+            "price",
+            "thumbnail",
+            "view_count",
+            "transaction_status",
+        )
+
+    def get_thumbnail(self, obj):
+        # 대표 이미지(is_main=True)가 있으면 그 URL 반환, 없으면 첫 번째 이미지
+        main_image = obj.product.images.filter(is_main=True).first()
+        if main_image:
+            return main_image.url
+        first_image = obj.product.images.first()
+        return first_image.url if first_image else None
+
+
+class LikeToggleSerializer(serializers.Serializer):
+    # 찜 토글용 시리얼라이저
+    product_id = serializers.IntegerField()
 
     def validate_product_id(self, value):
-        # 상품 존재 여부 확인
         try:
             Product.objects.get(id=value)
         except Product.DoesNotExist:
             raise serializers.ValidationError("존재하지 않는 상품입니다.")
         return value
-    
-    def validate(self, attrs):
-        # 중복 찜 방지
-        user = self.context['request'].user
-        product_id = attrs['product_id']
 
-        if Like.objects.filter(user=user, Product_id=product_id).exists():
-            raise serializers.ValidationError("이미 관심 목록에 등록된 상품입니다.")
-        
-        return attrs
-    
-    def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
-        return super().create(validated_data)
-    
-class LikeListSerializer(serializers.ModelSerializer):
-    # 찜 목록 조회용 시리얼라이저
-    Product_title = serializers.CharField(source='product.post.title', read_only = True)
-    Product_price = serializers.IntegerField(source='product.price', read_only = True)
-    product_status = serializers.CharField(source='product.status', read_only = True)
+    # 찜 당한 상품게시글의 찜 갯수 시리얼라이저
+
+
+class ProductLikeCountSerializer(serializers.ModelSerializer):
+    like_count = serializers.IntegerField(read_only=True)
 
     class Meta:
-        model = Like
-        fields = [
-            'id',
-            'product_id',
-            'product_title',
-            'product_price',
-            'product_status',
-            'product_image',
-            'create_at'
-        ]
-    
-    def get_product_image(self, obj):
-        # 상품의 첫 번쩨 이미지 URL 반환
-        first_image = obj.product.images.first()
-        if first_image:
-            return first_image.image_url
-        return None
-    
-class SimpleLikeSerializer(serializers.ModelSerializer):
-    # API 문서 응답 형십에 맞춘 간단한 시리얼라이저
-
-    class Mata:
-        model = Like
-        fields = ['product_id', 'create_at']
+        model = Product
+        fields = ["like_count"]
