@@ -24,7 +24,11 @@ class ProductAdmin(admin.ModelAdmin):
         "updated_at",
         "user",
     )  # 목록에서 보이는 필드
-    list_filter = ("transaction_status", "condition_status", "created_at")  # 필터 사이드바
+    list_filter = (
+        "transaction_status",
+        "condition_status",
+        "created_at",
+    )  # 필터 사이드바
     search_fields = ("title", "description", "user__nickname")  # 검색 기능
     ordering = ("-created_at",)  # 최신순 정렬
     inlines = [ProductImageInline]  # 상품 상세에 이미지 inline 추가
