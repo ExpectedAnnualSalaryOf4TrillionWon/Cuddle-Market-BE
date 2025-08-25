@@ -3,6 +3,7 @@ from django.conf import settings
 from apps.products.models import Product
 
 
+
 # 상품 찜(Like) 테이블
 class ProductLike(models.Model):
     user = models.ForeignKey(
@@ -27,3 +28,5 @@ class ProductLike(models.Model):
 
     def __str__(self):
         return f"{self.user} liked {self.product}"
+
+

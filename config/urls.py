@@ -12,9 +12,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/users/", include("apps.users.urls")),
     path("api/v1/categories/", include("apps.categories.urls")),
-    path("api/v1/", include("apps.chats.urls")),
+    path("api/v1/chatrooms/", include("apps.chats.urls")),
+    path("api/v1/likes/", include("apps.likes.urls")),
 ]
-
 if settings.DEBUG:
     urlpatterns += (
         path(
