@@ -9,7 +9,7 @@ from .models import Category, PetType, State
 from .serializers import (
     CategorySerializer,
     PetTypeWithDetailsSerializer,
-    StateWithCitiesSerializer,
+    # StateWithCitiesSerializer,
 )
 
 
