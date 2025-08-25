@@ -1,12 +1,19 @@
-from django.db import models  
+from django.db import models
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import ChatRoom
-from .serializers import ChatRoomListSerializer,ChatRoomCreateSerializer,ChatMessageCreateSerializer,ChatMessageListSerializer
+from .serializers import (
+    ChatRoomListSerializer,
+    ChatRoomCreateSerializer,
+    ChatMessageCreateSerializer,
+    ChatMessageListSerializer,
+)
 from rest_framework.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+
+
 class ChatRoomListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -25,20 +32,19 @@ class ChatRoomListCreateView(APIView):
 
     # 채팅방 생성
     def post(self, request):
-        serializer = ChatRoomCreateSerializer(data=request.data, context={"request": request})
+        serializer = ChatRoomCreateSerializer(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
         chatroom = serializer.save()
 
         return Response(
-            {
-                "chatroom_id": chatroom.id,
-                "message": "채팅방이 생성되었습니다."
-            },
-            status=status.HTTP_201_CREATED
+            {"chatroom_id": chatroom.id, "message": "채팅방이 생성되었습니다."},
+            status=status.HTTP_201_CREATED,
         )
-    
 
-class ChatRoomDeleteView(APIView): # 채팅방 삭제 기능 
+
+class ChatRoomDeleteView(APIView):  # 채팅방 삭제 기능
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, chatroom_id):
@@ -46,16 +52,21 @@ class ChatRoomDeleteView(APIView): # 채팅방 삭제 기능
         try:
             chatroom = ChatRoom.objects.get(id=chatroom_id)
         except ChatRoom.DoesNotExist:
-            return Response({"message": "존재하지 않는 채팅방입니다."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "존재하지 않는 채팅방입니다."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         if chatroom.buyer != user and chatroom.seller != user:
             raise PermissionDenied("삭제 권한이 없습니다.")
 
         chatroom.delete()
-        return Response({"message": "채팅방이 삭제되었습니다."}, status=status.HTTP_200_OK)
-    
+        return Response(
+            {"message": "채팅방이 삭제되었습니다."}, status=status.HTTP_200_OK
+        )
 
-class ChatMessageView(APIView):# 메시지 내역 조회랑/메시지 전송 같이 만듬
+
+class ChatMessageView(APIView):  # 메시지 내역 조회랑/메시지 전송 같이 만듬
     permission_classes = [IsAuthenticated]
 
     # 메시지 목록 조회 (GET)
@@ -90,6 +101,4 @@ class ChatMessageView(APIView):# 메시지 내역 조회랑/메시지 전송 같
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(
-            {"message": "메시지 전송 완료"}, status=status.HTTP_201_CREATED
-        )
+        return Response({"message": "메시지 전송 완료"}, status=status.HTTP_201_CREATED)

@@ -47,4 +47,6 @@ class Command(BaseCommand):
         # 3. 최종 요약 메시지를 명확하게 출력
         self.stdout.write("-" * 50)
         self.stdout.write(self.style.SUCCESS("작업 요약:"))
-        self.stdout.write(f"- 시/도 데이터: {created_count}개 생성, {updated_count}개 업데이트 완료.")
+        self.stdout.write(
+            f"- 시/도 데이터: {created_count}개 생성, {updated_count}개 업데이트 완료."
+        )

@@ -27,5 +27,5 @@ jobs:
         run: |
           echo "Starting ruff"
           uv run ruff format
-          uv run ruff check --fix
+          uv run ruff check --diff
           echo "OK"

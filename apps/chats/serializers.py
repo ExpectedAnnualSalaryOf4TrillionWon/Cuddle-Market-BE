@@ -1,15 +1,20 @@
 from rest_framework import serializers
-from .models import ChatRoom,ChatMessage
-from apps.products.models import ProductImage,Product
-from apps.users.models import User #채팅방 유저 이름 가져오려구import
+from .models import ChatRoom, ChatMessage
+from apps.products.models import ProductImage, Product
+from apps.users.models import User  # 채팅방 유저 이름 가져오려구import
+
 
 class ChatRoomListSerializer(serializers.ModelSerializer):
-    partner_nickname = serializers.SerializerMethodField()   # 상대방 닉네임
-    product_image = serializers.SerializerMethodField()      # 상품 대표 이미지
-    last_message = serializers.SerializerMethodField()       # 마지막 메시지 내용
+    partner_nickname = serializers.SerializerMethodField()  # 상대방 닉네임
+    product_image = serializers.SerializerMethodField()  # 상품 대표 이미지
+    last_message = serializers.SerializerMethodField()  # 마지막 메시지 내용
     last_message_time = serializers.SerializerMethodField()  # 마지막 메시지 시간
-    product_title = serializers.CharField(source="product.title", read_only=True)  # 상품명
-    product_price = serializers.DecimalField(source="product.price", max_digits=10, decimal_places=2, read_only=True)  # 가격
+    product_title = serializers.CharField(
+        source="product.title", read_only=True
+    )  # 상품명
+    product_price = serializers.DecimalField(
+        source="product.price", max_digits=10, decimal_places=2, read_only=True
+    )  # 가격
 
     class Meta:
         model = ChatRoom
@@ -29,7 +34,9 @@ class ChatRoomListSerializer(serializers.ModelSerializer):
 
     # 상품 대표 이미지 (ProductImage 중 is_main=True)
     def get_product_image(self, obj):
-        main_image = ProductImage.objects.filter(product=obj.product, is_main=True).first()
+        main_image = ProductImage.objects.filter(
+            product=obj.product, is_main=True
+        ).first()
         return main_image.url if main_image else None
 
     # 최근 메시지 내용
@@ -41,8 +48,8 @@ class ChatRoomListSerializer(serializers.ModelSerializer):
     def get_last_message_time(self, obj):
         last_msg = obj.messages.order_by("-created_at").first()
         return last_msg.created_at if last_msg else None
-    
-    
+
+
 class ChatRoomCreateSerializer(serializers.ModelSerializer):
     buyer_id = serializers.IntegerField(write_only=True)
     seller_id = serializers.IntegerField(write_only=True)
@@ -61,7 +68,7 @@ class ChatRoomCreateSerializer(serializers.ModelSerializer):
             buyer=buyer, seller=seller, product=product
         )
         return chatroom
-    
+
 
 class ChatMessageCreateSerializer(serializers.ModelSerializer):
     content = serializers.CharField(write_only=True)
@@ -81,7 +88,8 @@ class ChatMessageCreateSerializer(serializers.ModelSerializer):
             sender=sender,
             message=validated_data["content"],
         )
-    
+
+
 class ChatMessageListSerializer(serializers.ModelSerializer):
     sender_nickname = serializers.CharField(source="sender.nickname", read_only=True)
 

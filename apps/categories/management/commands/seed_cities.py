@@ -271,7 +271,9 @@ class Command(BaseCommand):
             # 2. 미리 가져온 맵에서 State 객체를 찾지 못하면 건너뜁니다.
             if not state_obj:
                 self.stdout.write(
-                    self.style.WARNING(f"State '{state_code}'을(를) 찾을 수 없습니다. 이 시/도의 City 데이터는 건너뜁니다.")
+                    self.style.WARNING(
+                        f"State '{state_code}'을(를) 찾을 수 없습니다. 이 시/도의 City 데이터는 건너뜁니다."
+                    )
                 )
                 skipped_count += len(city_names)
                 continue
@@ -293,6 +295,12 @@ class Command(BaseCommand):
         # 4. 최종 요약 메시지를 정확하게 출력
         self.stdout.write("-" * 50)
         self.stdout.write(self.style.SUCCESS("작업 요약:"))
-        self.stdout.write(f"- 시/군/구 데이터: {created_count}개 생성, {updated_count}개 업데이트 완료.")
+        self.stdout.write(
+            f"- 시/군/구 데이터: {created_count}개 생성, {updated_count}개 업데이트 완료."
+        )
         if skipped_count > 0:
-            self.stdout.write(self.style.WARNING(f"- 총 {skipped_count}개의 시/군/구 데이터는 부모 시/도를 찾지 못해 건너뛰었습니다."))
+            self.stdout.write(
+                self.style.WARNING(
+                    f"- 총 {skipped_count}개의 시/군/구 데이터는 부모 시/도를 찾지 못해 건너뛰었습니다."
+                )
+            )
