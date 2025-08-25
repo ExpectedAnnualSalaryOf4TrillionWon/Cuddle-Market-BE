@@ -9,6 +9,7 @@ from django.conf import settings
 
 User = get_user_model()
 
+
 class JWTAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
         query_string = scope["query_string"].decode()
@@ -24,8 +25,8 @@ class JWTAuthMiddleware(BaseMiddleware):
                 # 2) 토큰 디코드
                 decoded = jwt.decode(
                     token,
-                    settings.SECRET_KEY,   # SIMPLE_JWT 대신 SECRET_KEY 사용
-                    algorithms=["HS256"]
+                    settings.SECRET_KEY,  # SIMPLE_JWT 대신 SECRET_KEY 사용
+                    algorithms=["HS256"],
                 )
 
                 # 👉 여기에 print 추가 (디버깅용)
@@ -40,7 +41,7 @@ class JWTAuthMiddleware(BaseMiddleware):
                     scope["user"] = await self.get_user(user_id)
 
             except Exception as e:
-                print("❌ JWT Error:", e)   # 👉 에러 찍기
+                print("❌ JWT Error:", e)  # 👉 에러 찍기
                 scope["user"] = AnonymousUser()
         else:
             print("⚠️ WebSocket 연결에 token 쿼리 파라미터 없음")

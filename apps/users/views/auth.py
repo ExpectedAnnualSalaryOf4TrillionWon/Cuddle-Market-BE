@@ -359,104 +359,93 @@ class LogoutView(APIView):
             # 네트워크 에러 등
             raise RuntimeError(f"Kakao logout network error: {e}")
 
-# class WithdrawalView(APIView):
-#     """
-#     회원탈퇴 API
-#     """
-#
-#     @extend_schema(
-#         summary="회원탈퇴",
-#         description="유저를 soft delete로 관리하는 회원탈퇴 API입니다",
-#         tags=["User"],
-#     )
-#     def delete(self, request):
-#         user = request.user
-#         # 소셜 유저라면 소셜 로그인을 먼저 끊어주기 위한 if문
-#         if user.provider_id is not None:
-#             try:
-#                 # 엑세스토큰 refresh 요청
-#                 kakao_refresh_url = "https://kauth.kakao.com/oauth/token"
-#                 data = {
-#                     "grant_type": "refresh_token",
-#                     "client_id": KAKAO_CLIENT_ID,
-#                     "refresh_token": REDIS_CLIENT.get(
-#                         RedisKeys.get_kakao_refresh_token_key(request.user.provider_id)
-#                     ),
-#                 }
-#                 token_response = requests.post(kakao_refresh_url, data=data)
-#                 if token_response.status_code != 200:
-#                     return Response(
-#                         {"error": "카카오 토큰 재발급에 실패했습니다."},
-#                         status=status.HTTP_400_BAD_REQUEST,
-#                     )
-#
-#                 # 카카오 연결 끊기
-#                 unlink_url = "https://kapi.kakao.com/v1/user/unlink"
-#                 kakao_access_token = token_response.json()["access_token"]
-#                 headers = {"Authorization": f"Bearer {kakao_access_token}"}
-#                 response = requests.post(unlink_url, headers=headers)
-#                 if response.status_code != 200:
-#                     return Response(
-#                         {"error": "카카오 계정 연결 해제 실패"},
-#                         status=status.HTTP_400_BAD_REQUEST,
-#                     )
-#
-#             except Exception:
-#                 return Response(
-#                     {
-#                         "error": "소셜 계정 연결 해제 중 오류 발생, 관리자에게 문의해주세요"
-#                     },
-#                     status=status.HTTP_400_BAD_REQUEST,
-#                 )
-#
-#         # 쿠키에서 refresh token 추출
-#         refresh_token = request.COOKIES.get("refresh_token")
-#         if refresh_token:
-#             try:
-#                 token = RefreshToken(refresh_token)
-#                 token.blacklist()
-#             except Exception:
-#                 return Response(
-#                     {"error": "관리자에게 문의해주세요"},
-#                     status=status.HTTP_400_BAD_REQUEST,
-#                 )
-#
-#         # 소프트 삭제하기 전에 닉네임 중복 방지를 위해 uuid로 랜덤한 값을 넣어줌
-#         # 17자 이상이면 데이터를 보관하기 보다는 문제를 야기시킬 수 있는 확률을 제거하도록 로직 설정
-#         if len(user.nickname) >= 17 or len(user.phone_number) >= 17:
-#             user.nickname = uuid.uuid4().hex[:10]
-#             user.phone_number = uuid.uuid4().hex[:10]
-#         else:
-#             user.nickname = (
-#                 user.nickname + " / " + uuid.uuid4().hex[: 17 - len(user.nickname)]
-#             )
-#             user.phone_number = (
-#                 user.phone_number
-#                 + " / "
-#                 + uuid.uuid4().hex[: 17 - len(user.phone_number)]
-#             )
-#         user.is_active = False
-#         user.save()
-#
-#         # soft delete 처리
-#         user.delete()
-#
-#         # refresh token 삭제 후 응답 반환
-#         response = Response(
-#             {
-#                 "detail": "회원 탈퇴가 완료되었습니다. 같은 이메일로 재가입해도 데이터는 남아있지 않습니다."
-#             },
-#             status=status.HTTP_200_OK,
-#         )
-#         response.delete_cookie("refresh_token")
-#         # 소셜로그인 캐시 정보 삭제
-#         REDIS_CLIENT.delete(
-#             RedisKeys.get_kakao_refresh_token_key(request.user.provider_id)
-#         )
-#         REDIS_CLIENT.delete(
-#             RedisKeys.get_kakao_access_token_key(request.user.provider_id)
-#         )
-#         return response
+
+class WithdrawalView(APIView):
+    """
+    회원탈퇴 API
+    """
+
+    @extend_schema(
+        summary="회원탈퇴",
+        description="카카오 소셜 계정 연동 해제 및 서비스의 모든 사용자 데이터를 삭제합니다.",
+        tags=["User"],
+    )
+    def delete(self, request):
+        user = request.user
+
+        # 삭제 전 필요한 정보 미리 저장
+        provider = getattr(user, "provider", None)
+        provider_id = getattr(user, "provider_id", None)
+        # user_id = user.id  # 로그용
+
+        # JWT 토큰 블랙리스트 처리
+        refresh_token = request.COOKIES.get("refresh_token")
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except (TokenError, Exception):
+                pass
+
+        try:
+            # 1. DB 삭제를 먼저 수행 (가장 중요한 작업)
+            with transaction.atomic():
+                user.delete()
+
+            # 2. DB 삭제 성공 후 카카오 연동 해제 시도
+            if provider == "KAKAO" and provider_id:
+                try:
+                    self._withdrawal_kakao(provider_id)
+                except Exception:
+                    # 카카오 연동 해제 실패 시 경고 로그
+                    # logger.warning(f"Kakao unlink failed for deleted user {user_id}: {e}")
+                    # 사용자에게는 성공으로 응답하되, 관리자가 수동 처리할 수 있도록 로그 남김
+                    pass
+
+            # 3. Redis 캐시 삭제
+            if provider_id:
+                try:
+                    REDIS_CLIENT.delete(
+                        RedisKeys.get_kakao_access_token_key(provider_id)
+                    )
+                except Exception:
+                    pass
+
+        except Exception:
+            # DB 삭제 실패 시에만 에러 응답
+            # logger.error(f"User deletion database error for user {user_id}: {e}")
+            return Response(
+                {"error": "회원탈퇴 처리 중 오류가 발생했습니다."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # 성공 응답
+        response = Response(
+            {"message": "회원탈퇴가 성공적으로 완료되었습니다."},
+            status=status.HTTP_200_OK,
+        )
+        response.delete_cookie("refresh_token")
+        return response
+
+    @staticmethod
+    def _withdrawal_kakao(provider_id: str):
+        kakao_access_token = REDIS_CLIENT.get(
+            RedisKeys.get_kakao_access_token_key(provider_id)
+        )
+
+        if not kakao_access_token:
+            return
+
+        if isinstance(kakao_access_token, bytes):
+            kakao_access_token = kakao_access_token.decode("utf-8")
+
+        headers = {"Authorization": f"Bearer {kakao_access_token}"}
+
+        # 여기서 RuntimeError를 발생시키는 대신, 예외를 그대로 호출한 쪽으로 전달
+        requests.post(
+            "https://kapi.kakao.com/v1/user/unlink", headers=headers, timeout=5
+        ).raise_for_status()
+
 
 class DevLoginView(APIView):
     authentication_classes = ()

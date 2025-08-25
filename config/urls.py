@@ -8,12 +8,14 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from django.conf.urls.static import static
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/users/", include("apps.users.urls")),
     path("api/v1/categories/", include("apps.categories.urls")),
     path("api/v1/chatrooms/", include("apps.chats.urls")),
     path("api/v1/likes/", include("apps.likes.urls")),
+
 ]
 if settings.DEBUG:
     urlpatterns += (
@@ -30,5 +32,5 @@ if settings.DEBUG:
         ),
     )
 
-if settings.DEBUG:# 개발 모드일 때만 static 서빙
+if settings.DEBUG:  # 개발 모드일 때만 static 서빙
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

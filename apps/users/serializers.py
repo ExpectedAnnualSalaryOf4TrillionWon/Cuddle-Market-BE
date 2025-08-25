@@ -31,6 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_superuser",
             "profile_completed",
             "last_login",
+            "created_at",
         )
         read_only_fields = fields
 
@@ -60,8 +61,8 @@ class SocialProfileRegistrationSerializer(serializers.ModelSerializer):
             "nickname",
             "name",
             "birthday",
-            "state",
-            "city",
+            "state_name",
+            "city_name",
         ]
 
     def validate_nickname(self, value):

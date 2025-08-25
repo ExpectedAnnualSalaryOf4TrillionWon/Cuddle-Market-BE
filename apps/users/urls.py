@@ -6,6 +6,7 @@ from .views.auth import (
     SocialProfileRegistrationView,
     LogoutView,
     DevLoginView,
+    WithdrawalView,
 )
 
 urlpatterns = [
@@ -17,6 +18,7 @@ urlpatterns = [
         name="profile-complete",
     ),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("withdrawal/", WithdrawalView.as_view(), name="withdrawal"),
 ]
 
 if settings.DEBUG:

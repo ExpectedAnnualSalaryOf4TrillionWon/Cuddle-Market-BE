@@ -140,7 +140,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = "staticfiles" 
+STATIC_ROOT = "staticfiles"
 # "/app/staticfiles"
 
 # Default primary key field type
@@ -170,11 +170,11 @@ CORS_ALLOW_CREDENTIALS = True  # 쿠키를 포함한 요청 허용
 CORS_ALLOWED_METHODS = ["GET", "POST", "DELETE", "PUT", "PATCH"]
 CORS_ALLOWED_HEADERS = ["Content-Type", "Authorization"]
 
-#CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", f"https://{DOMAIN_NAME}","http://127.0.0.1"]
-#CSRF_COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", f"https://{DOMAIN_NAME}"]
+
 
 REDIS_CLIENT = redis.StrictRedis(
-    host=os.getenv("REDIS_HOST", "127.0.0.1"),
+    host=os.getenv("REDIS_HOST"),
     port=6379,
     db=0,
     decode_responses=True,  # 문자열 반환을 위해 decode_responses=True 설정
@@ -182,15 +182,15 @@ REDIS_CLIENT = redis.StrictRedis(
 
 # 레디스 주소
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [(os.getenv("REDIS_HOST", "127.0.0.1"), 6379)],  # Redis 주소
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # Redis 주소
         },
     },
 }
 
-ASGI_APPLICATION = 'config.asgi.application'
+ASGI_APPLICATION = "config.asgi.application"
 
 SIMPLE_JWT = {
     "ALGORITHM": "HS256",
