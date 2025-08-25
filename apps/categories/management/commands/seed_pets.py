@@ -11,38 +11,58 @@ class Command(BaseCommand):
         """
         데이터가 이미 존재하면 업데이트하고, 없으면 새로 생성합니다.
         """
-        self.stdout.write(self.style.SUCCESS("반려동물 데이터 시딩/업데이트를 시작합니다..."))
+        self.stdout.write(
+            self.style.SUCCESS("반려동물 데이터 시딩/업데이트를 시작합니다...")
+        )
 
         all_pets_data = {
             "포유류": {
                 "code": "MAMMAL",
                 "details": {
-                    "강아지": "DOG", "고양이": "CAT", "토끼": "RABBIT", "햄스터": "HAMSTER",
-                    "기니피그": "GUINEA_PIG", "페럿": "FERRET", "친칠라": "CHINCHILLA", "고슴도치": "HEDGEHOG",
+                    "강아지": "DOG",
+                    "고양이": "CAT",
+                    "토끼": "RABBIT",
+                    "햄스터": "HAMSTER",
+                    "기니피그": "GUINEA_PIG",
+                    "페럿": "FERRET",
+                    "친칠라": "CHINCHILLA",
+                    "고슴도치": "HEDGEHOG",
                 },
             },
             "조류": {
                 "code": "BIRD",
                 "details": {
-                    "잉꼬": "BUDGERIGAR", "앵무새": "PARROT", "카나리아": "CANARY", "모란앵무": "LOVEBIRD",
+                    "잉꼬": "BUDGERIGAR",
+                    "앵무새": "PARROT",
+                    "카나리아": "CANARY",
+                    "모란앵무": "LOVEBIRD",
                 },
             },
             "파충류": {
                 "code": "REPTILE",
                 "details": {
-                    "도마뱀": "LIZARD", "뱀": "SNAKE", "거북이": "TURTLE", "게코": "GECKO",
+                    "도마뱀": "LIZARD",
+                    "뱀": "SNAKE",
+                    "거북이": "TURTLE",
+                    "게코": "GECKO",
                 },
             },
             "수생동물": {
                 "code": "AQUATIC",
                 "details": {
-                    "금붕어": "GOLDFISH", "열대어": "TROPICAL_FISH", "체리새우": "CHERRY_SHRIMP", "달팽이": "SNAIL",
+                    "금붕어": "GOLDFISH",
+                    "열대어": "TROPICAL_FISH",
+                    "체리새우": "CHERRY_SHRIMP",
+                    "달팽이": "SNAIL",
                 },
             },
             "곤충/절지동물": {
                 "code": "INSECT_ARTHROPOD",
                 "details": {
-                    "귀뚜라미": "CRICKET", "사마귀": "MANTIS", "딱정벌레": "BEETLE", "거미": "SPIDER",
+                    "귀뚜라미": "CRICKET",
+                    "사마귀": "MANTIS",
+                    "딱정벌레": "BEETLE",
+                    "거미": "SPIDER",
                 },
             },
         }
@@ -80,5 +100,9 @@ class Command(BaseCommand):
         # 최종 결과 요약 출력
         self.stdout.write("-" * 50)
         self.stdout.write(self.style.SUCCESS("작업 요약:"))
-        self.stdout.write(f"- PetType:     {types_created}개 생성, {types_updated}개 업데이트 완료.")
-        self.stdout.write(f"- PetTypeDetail: {details_created}개 생성, {details_updated}개 업데이트 완료.")
+        self.stdout.write(
+            f"- PetType:     {types_created}개 생성, {types_updated}개 업데이트 완료."
+        )
+        self.stdout.write(
+            f"- PetTypeDetail: {details_created}개 생성, {details_updated}개 업데이트 완료."
+        )
