@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny  # 필요시 인증 없이 접�
 from drf_spectacular.utils import extend_schema
 
 # 필요한 모든 모델과 시리얼라이저를 임포트합니다.
-from .models import Category, PetType, State
+from .models import Category, PetType
 from .serializers import (
     CategorySerializer,
     PetTypeWithDetailsSerializer,
