@@ -6,7 +6,9 @@ from .views.auth import (
     SocialProfileRegistrationView,
     LogoutView,
     DevLoginView,
+    WithdrawalView,
 )
+from .views.profile import MyProfileView
 
 urlpatterns = [
     path("token-refresh/", TokenRefreshView.as_view(), name="token-refresh"),
@@ -17,6 +19,8 @@ urlpatterns = [
         name="profile-complete",
     ),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("withdrawal/", WithdrawalView.as_view(), name="withdrawal"),
+    path("mypage/", MyProfileView.as_view(), name="mypage"),
 ]
 
 if settings.DEBUG:

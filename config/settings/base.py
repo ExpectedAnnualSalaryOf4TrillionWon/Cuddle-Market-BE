@@ -37,6 +37,24 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+LOCAL_APPS = [
+    "apps.users",
+    "apps.products",
+    "apps.categories",
+    "apps.likes",
+    "apps.chats",
+]
+
+THIRD_PARTY_APPS = [
+    "daphne",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "drf_spectacular",
+    "corsheaders",
+    "channels",
+]
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -46,20 +64,8 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARTY_APPS = [
-    "rest_framework",
-    "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist",
-    "apps.users",
-    "apps.products",
-    "apps.categories",
-    "apps.likes",
-    "apps.chats",
-    "drf_spectacular",
-    "corsheaders",
-]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
+INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS + DJANGO_APPS
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -137,7 +143,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = "/app/staticfiles"
+STATIC_ROOT = "staticfiles"
+# "/app/staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -167,7 +174,7 @@ CORS_ALLOWED_METHODS = ["GET", "POST", "DELETE", "PUT", "PATCH"]
 CORS_ALLOWED_HEADERS = ["Content-Type", "Authorization"]
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", f"https://{DOMAIN_NAME}"]
-CSRF_COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
+
 
 REDIS_CLIENT = redis.StrictRedis(
     host=os.getenv("REDIS_HOST"),
@@ -175,3 +182,20 @@ REDIS_CLIENT = redis.StrictRedis(
     db=0,
     decode_responses=True,  # 문자열 반환을 위해 decode_responses=True 설정
 )
+
+# 레디스 주소
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # Redis 주소
+        },
+    },
+}
+
+ASGI_APPLICATION = "config.asgi.application"
+
+SIMPLE_JWT = {
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+}

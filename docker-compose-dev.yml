@@ -10,7 +10,7 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.dev
       - SECRET_KEY=${DJANGO_SECRET_KEY}
-      - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      #- ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
     volumes:
       - ./:/app
       - /app/.venv
@@ -22,12 +22,12 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "python", "manage.py", "check", "--database", "default"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
+    # healthcheck:
+    #   test: ["CMD", "python", "manage.py", "check", "--database", "default"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 40s
 
   redis:
     image: redis:7-alpine # 특정 버전 명시
@@ -48,8 +48,8 @@ services:
     container_name: nginx
     restart: unless-stopped
     depends_on:
-      django:
-        condition: service_healthy
+      - django
+        # condition: service_healthy
     ports:
       - "80:80"
     volumes:

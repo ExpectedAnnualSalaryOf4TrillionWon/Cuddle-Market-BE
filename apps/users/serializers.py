@@ -1,7 +1,10 @@
+import os
+
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from datetime import date
 from apps.categories.models import State, City
+from apps.s3_utils import upload_to_s3_and_get_url
 
 User = get_user_model()
 
@@ -31,6 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_superuser",
             "profile_completed",
             "last_login",
+            "created_at",
         )
         read_only_fields = fields
 
@@ -42,7 +46,7 @@ class SocialProfileRegistrationSerializer(serializers.ModelSerializer):
     """
 
     # 1. state 필드를 SlugRelatedField로 변경
-    state = serializers.SlugRelatedField(
+    state_name = serializers.SlugRelatedField(
         queryset=State.objects.all(),  # 이 이름으로 객체를 찾을 DB 테이블
         slug_field="name",  # 'name' 필드를 기준으로 찾고, 보여줌
         allow_null=True,  # null 값을 허용
@@ -50,7 +54,7 @@ class SocialProfileRegistrationSerializer(serializers.ModelSerializer):
     )
 
     # 2. city 필드도 SlugRelatedField로 변경
-    city = serializers.SlugRelatedField(
+    city_name = serializers.SlugRelatedField(
         queryset=City.objects.all(), slug_field="name", allow_null=True, required=False
     )
 
@@ -60,8 +64,8 @@ class SocialProfileRegistrationSerializer(serializers.ModelSerializer):
             "nickname",
             "name",
             "birthday",
-            "state",
-            "city",
+            "state_name",
+            "city_name",
         ]
 
     def validate_nickname(self, value):
@@ -96,6 +100,71 @@ class SocialProfileRegistrationSerializer(serializers.ModelSerializer):
         instance.save(update_fields=["profile_completed"] + list(validated_data.keys()))
 
         return instance
+
+
+class UpdateMyPageSerializer(serializers.ModelSerializer):
+    """
+    마이페이지 정보 조회 및 수정을 위한 Serializer
+    - state와 city는 이름(name)으로 입력받아 처리
+    """
+
+    profile_image_file = serializers.ImageField(
+        write_only=True, required=False, allow_null=True
+    )
+    state = serializers.SlugRelatedField(
+        queryset=State.objects.all(), slug_field="name", allow_null=True, required=False
+    )
+    city = serializers.SlugRelatedField(
+        queryset=City.objects.all(), slug_field="name", allow_null=True, required=False
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "nickname",
+            "state",
+            "city",
+            "profile_image_file",
+            "profile_image",
+        ]
+        extra_kwargs = {
+            "profile_image_file": {
+                "error_messages": {"invalid": "유효한 이미지 파일을 선택해주세요."}
+            },
+            "profile_image": {
+                "read_only": True,
+            },
+        }
+
+    # def to_representation(self, instance):
+    #     result = super().to_representation(instance)
+    #     return result
+    #     result["profile_image"] = instance.profile_image
+
+    def update(self, instance, validated_data):
+        # ... (update 메서드는 이전과 동일)
+        profile_image_file = validated_data.pop("profile_image_file", None)
+
+        if not profile_image_file:
+            return super().update(instance, validated_data)
+
+        import uuid
+
+        short_uuid = str(uuid.uuid4())[:8]
+        original_filename = profile_image_file.name.replace(" ", "_")
+        new_filename = f"{short_uuid}-{original_filename}"
+        object_name = f"profiles/{instance.id}/{new_filename}"
+
+        bucket_name = os.getenv("AWS_S3_BUCKET_NAME")
+        s3_url = upload_to_s3_and_get_url(profile_image_file, bucket_name, object_name)
+
+        if not s3_url:
+            raise serializers.ValidationError(
+                {"profile_image": "이미지 업로드에 실패했습니다."}
+            )
+
+        validated_data["profile_image"] = s3_url
+        return super().update(instance, validated_data)
 
 
 class DevLoginSerializer(serializers.Serializer[None]):
