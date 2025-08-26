@@ -1,14 +1,13 @@
 from rest_framework import serializers
-from apps.likes.models import ProductLike
+from rest_framework.exceptions import ValidationError
+from .models import ProductLike
 from apps.products.models import Product
-from django.db import IntegrityError
+from django.db import transaction
 
 
 class ProductLikeSerializer(serializers.ModelSerializer):
-    # 요청에서는 product_id 사용
-    product_id = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.all(), source="product", write_only=True
-    )
+    # 요청: product_id (BIGINT 범위 검증)
+    product_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = ProductLike
@@ -16,21 +15,27 @@ class ProductLikeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        product = validated_data["product"]
+        product_id = validated_data["product_id"]
 
-        # 중복 방지
-        if ProductLike.objects.filter(user=user, product=product).exists():
-            raise IntegrityError("이미 관심 상품으로 추가된 상품입니다.")
+        # 트랜잭션으로 동시성 문제 방지
+        with transaction.atomic():
+            try:
+                # Product 객체를 직접 가져오기 (FK 무결성 보장)
+                product = Product.objects.select_for_update().get(id=product_id)
+            except Product.DoesNotExist:
+                raise ValidationError("존재하지 않는 상품입니다.")
+        # race condition 방지를 위해 get_or_create 사용
+        like, created = ProductLike.objects.get_or_create(user=user, product=product)
 
-        return ProductLike.objects.create(user=user, product=product)
+        if not created:
+            raise ValidationError("이미 관심 상품으로 추가된 상품입니다.")
+
+        return like
 
     def to_representation(self, instance):
-        """
-        응답을 명세서 형식에 맞게 변경
-        """
         return {
             "message": "관심 목록에 추가되었습니다.",
-            "product_id": instance.product.id,
+            "product_id": instance.product_id,  # FK → _id 자동 제공
             "is_liked": True,
         }
 
@@ -66,23 +71,25 @@ class LikeListSerializer(serializers.ModelSerializer):
         return first_image.url if first_image else None
 
 
-class LikeToggleSerializer(serializers.Serializer):
-    # 찜 토글용 시리얼라이저
+class ProductLikeDeleteSerializer(serializers.Serializer):  # 찜 삭제 시리얼라이저
     product_id = serializers.IntegerField()
 
     def validate_product_id(self, value):
-        try:
-            Product.objects.get(id=value)
-        except Product.DoesNotExist:
+        # 상품 존재 여부 확인
+        if not Product.objects.filter(id=value).exists():
             raise serializers.ValidationError("존재하지 않는 상품입니다.")
         return value
 
-    # 찜 당한 상품게시글의 찜 갯수 시리얼라이저
+    def validate(self, attrs):
+        user = self.context["request"].user
+        product_id = attrs["product_id"]
 
+        like_instance = ProductLike.objects.filter(
+            user=user, product_id=product_id
+        ).first()
 
-class ProductLikeCountSerializer(serializers.ModelSerializer):
-    like_count = serializers.IntegerField(read_only=True)
+        if not like_instance:
+            raise serializers.ValidationError("관심 등록되지 않은 상품입니다.")
 
-    class Meta:
-        model = Product
-        fields = ["like_count"]
+        attrs["like_instance"] = like_instance
+        return attrs
