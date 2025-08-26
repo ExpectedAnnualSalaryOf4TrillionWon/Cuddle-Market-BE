@@ -107,18 +107,15 @@ class UpdateMyPageSerializer(serializers.ModelSerializer):
     마이페이지 정보 조회 및 수정을 위한 Serializer
     - state와 city는 이름(name)으로 입력받아 처리
     """
-    profile_image_file = serializers.ImageField(write_only=True, required=False, allow_null=True)
+
+    profile_image_file = serializers.ImageField(
+        write_only=True, required=False, allow_null=True
+    )
     state = serializers.SlugRelatedField(
-        queryset=State.objects.all(),
-        slug_field='name',
-        allow_null=True,
-        required=False
+        queryset=State.objects.all(), slug_field="name", allow_null=True, required=False
     )
     city = serializers.SlugRelatedField(
-        queryset=City.objects.all(),
-        slug_field='name',
-        allow_null=True,
-        required=False
+        queryset=City.objects.all(), slug_field="name", allow_null=True, required=False
     )
 
     class Meta:
@@ -136,7 +133,7 @@ class UpdateMyPageSerializer(serializers.ModelSerializer):
             },
             "profile_image": {
                 "read_only": True,
-            }
+            },
         }
 
     # def to_representation(self, instance):
@@ -159,9 +156,7 @@ class UpdateMyPageSerializer(serializers.ModelSerializer):
         object_name = f"profiles/{instance.id}/{new_filename}"
 
         bucket_name = os.getenv("AWS_S3_BUCKET_NAME")
-        s3_url = upload_to_s3_and_get_url(
-            profile_image_file, bucket_name, object_name
-        )
+        s3_url = upload_to_s3_and_get_url(profile_image_file, bucket_name, object_name)
 
         if not s3_url:
             raise serializers.ValidationError(
@@ -170,6 +165,7 @@ class UpdateMyPageSerializer(serializers.ModelSerializer):
 
         validated_data["profile_image"] = s3_url
         return super().update(instance, validated_data)
+
 
 class DevLoginSerializer(serializers.Serializer[None]):
     email = serializers.EmailField()
