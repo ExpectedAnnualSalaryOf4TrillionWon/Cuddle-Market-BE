@@ -71,25 +71,35 @@ class LikeListSerializer(serializers.ModelSerializer):
         return first_image.url if first_image else None
 
 
-class ProductLikeDeleteSerializer(serializers.Serializer):  # 찜 삭제 시리얼라이저
-    product_id = serializers.IntegerField()
+class ProductLikeDeleteSerializer(serializers.Serializer):
+    # 이 필드는 오직 쓰기(입력)용입니다.
+    product_id = serializers.IntegerField(write_only=True)
 
-    def validate_product_id(self, value):
-        # 상품 존재 여부 확인
-        if not Product.objects.filter(id=value).exists():
-            raise serializers.ValidationError("존재하지 않는 상품입니다.")
-        return value
+    # Meta 클래스는 ModelSerializer가 아니므로 필요 없습니다.
 
     def validate(self, attrs):
         user = self.context["request"].user
-        product_id = attrs["product_id"]
+        product_id = attrs.get("product_id")
 
-        like_instance = ProductLike.objects.filter(
-            user=user, product_id=product_id
-        ).first()
+        if product_id is None:
+            raise serializers.ValidationError({"product_id": "이 필드는 필수입니다."})
 
-        if not like_instance:
-            raise serializers.ValidationError("관심 등록되지 않은 상품입니다.")
+        # 1. 상품 존재 여부 확인
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError(
+                {"product_id": "존재하지 않는 상품입니다."}
+            )
 
+        # 2. 현재 유저가 해당 상품을 '좋아요' 했는지 확인
+        try:
+            like_instance = ProductLike.objects.get(user=user, product=product)
+        except ProductLike.DoesNotExist:
+            raise serializers.ValidationError(
+                {"product_id": "관심 등록되지 않은 상품입니다."}
+            )
+
+        # 3. 검증이 끝난 인스턴스를 attrs에 추가하여 View에서 사용
         attrs["like_instance"] = like_instance
         return attrs
