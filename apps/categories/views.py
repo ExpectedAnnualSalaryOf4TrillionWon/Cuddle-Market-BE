@@ -1,26 +1,26 @@
-# Create your views here.
+# config/settings/base.py 에 정의된 REDIS_CLIENT를 가져옵니다.
+from apps.categories.models import Category, PetType
+from apps.categories.serializers import CategorySerializer, PetTypeWithDetailsSerializer
+from config.settings.base import REDIS_CLIENT
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny  # 필요시 인증 없이 접근 허용
+import json
 from drf_spectacular.utils import extend_schema
-
-# 필요한 모든 모델과 시리얼라이저를 임포트합니다.
-from .models import Category, PetType
-from .serializers import (
-    CategorySerializer,
-    PetTypeWithDetailsSerializer,
-    # StateWithCitiesSerializer,
-)
 
 
 class AllCategoryDataAPIView(APIView):
     """
-    프론트엔드 초기화에 필요한 모든 공통 기초 데이터
-    (카테고리, 반려동물 종류, 지역 정보)를 한번에 제공하는 API
+    프론트엔드 초기화에 필요한 모든 공통 기초 데이터.
+    redis-py 클라이언트를 직접 사용하여 Redis에 캐싱합니다.
+    (로거 제외, 안정성 강화 버전)
     """
 
-    permission_classes = (AllowAny,)  # 로그인 없이도 호출 가능하도록 설정
+    permission_classes = (AllowAny,)
     authentication_classes = ()
+
+    CACHE_KEY = "direct:all_category_data"
+    CACHE_TIMEOUT = 60 * 60 * 24  # 24시간
 
     @extend_schema(
         summary="카테고리 전체 조회",
@@ -28,21 +28,39 @@ class AllCategoryDataAPIView(APIView):
         tags=["Category"],
     )
     def get(self, request, *args, **kwargs):
-        # 1. 각 모델에서 모든 데이터를 가져옵니다. (성능 최적화 포함)
+        # --- 1. 캐시 조회 시도 (실패 시 조용히 넘어감) ---
+        try:
+            cached_data_json = REDIS_CLIENT.get(self.CACHE_KEY)
+            if cached_data_json:
+                # 캐시 히트: Redis에서 가져온 JSON을 파이썬 객체로 변환 후 반환
+                cached_data = json.loads(cached_data_json)
+                return Response(cached_data)
+        except Exception:
+            # Redis 연결 실패 시 아무것도 하지 않고 그냥 넘어갑니다.
+            # 이렇게 하면 서비스 중단 없이 DB에서 데이터를 조회하게 됩니다.
+            pass
+
+        # --- 2. DB 조회 (캐시가 없거나 Redis 연결 실패 시 실행) ---
         categories = Category.objects.all().order_by("id")
         pet_types = PetType.objects.prefetch_related("details").all().order_by("id")
-        # locations = State.objects.prefetch_related("cities").all().order_by("id")
 
-        # 2. 각 데이터셋에 맞는 시리얼라이저로 직렬화합니다.
         categories_data = CategorySerializer(categories, many=True).data
         pet_types_data = PetTypeWithDetailsSerializer(pet_types, many=True).data
-        # locations_data = StateWithCitiesSerializer(locations, many=True).data
 
-        # 3. 가독성 좋은 최상위 키를 사용하여 모든 데이터를 하나의 딕셔너리로 묶습니다.
         response_data = {
             "categories": categories_data,
             "petTypes": pet_types_data,
-            # "locations": locations_data,
         }
+
+        # --- 3. 캐시 저장 시도 (실패 시 조용히 넘어감) ---
+        try:
+            response_data_json = json.dumps(response_data, ensure_ascii=False)
+            REDIS_CLIENT.setex(
+                name=self.CACHE_KEY, time=self.CACHE_TIMEOUT, value=response_data_json
+            )
+        except Exception:
+            # 캐시 저장에 실패해도 API 응답은 정상적으로 나가야 하므로,
+            # 예외를 무시하고 그냥 넘어갑니다.
+            pass
 
         return Response(response_data)
