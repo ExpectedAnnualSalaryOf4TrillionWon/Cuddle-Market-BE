@@ -37,6 +37,24 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+LOCAL_APPS = [
+    "apps.users",
+    "apps.products",
+    "apps.categories",
+    "apps.likes",
+    "apps.chats",
+]
+
+THIRD_PARTY_APPS = [
+    "daphne",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "drf_spectacular",
+    "corsheaders",
+    "channels",
+]
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -46,22 +64,8 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARTY_APPS = [
-    "rest_framework",
-    "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist",
-    "apps.users",
-    "apps.products",
-    "apps.categories",
-    "apps.likes",
-    "apps.chats",
-    "drf_spectacular",
-    "corsheaders",
-    "channels",
-    "daphne",
-]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
+INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS + DJANGO_APPS
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
