@@ -1,4 +1,3 @@
-# config/urls.py
 from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
@@ -14,7 +13,7 @@ urlpatterns = [
     path("api/v1/users/", include("apps.users.urls")),
     path("api/v1/categories/", include("apps.categories.urls")),
     path("api/v1/chatrooms/", include("apps.chats.urls")),
-    path("api/v1/products/", include("apps.products.urls")),
+    # path("api/v1/products/", include("apps.products.urls")),
     path("api/v1/likes/", include("apps.likes.urls")),
 ]
 
