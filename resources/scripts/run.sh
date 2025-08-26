@@ -10,4 +10,7 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 # Gunicorn 실행
 echo "Starting Gunicorn..."
-exec daphne config.asgi:application -b 0.0.0.0 -p 8000
+exec gunicorn config.asgi:application \
+  -k uvicorn.workers.UvicornWorker \
+  --workers 4 \
+  --bind 0.0.0.0:8000

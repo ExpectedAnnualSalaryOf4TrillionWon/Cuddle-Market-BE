@@ -32,6 +32,16 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         client_max_body_size 20m;
     }
+    
+        # WebSocket 프록시 설정
+    location /ws/ {
+        proxy_pass http://django:8000;  # Channels/ASGI 서버
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 60m;
+    }
 
     # static 파일을 Nginx가 처리하도록 설정
     location /static/ {
