@@ -30,5 +30,5 @@ if settings.DEBUG:
             SpectacularRedocView.as_view(),
             name="redoc",
         ),
-        static(settings.STATIC_URL, document_root=settings.STATIC_ROOT),  # 스태틱 서빙
     )
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

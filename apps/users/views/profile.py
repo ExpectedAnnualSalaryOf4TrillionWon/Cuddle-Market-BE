@@ -13,6 +13,7 @@ class MyProfileView(APIView):
     """
     마이 페이지 API
     """
+
     parser_classes = (MultiPartParser,)
 
     @extend_schema(
@@ -42,4 +43,6 @@ class MyProfileView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         instance = serializer.save()
-        return Response(UpdateMyPageSerializer(instance).data, status=status.HTTP_200_OK)
+        return Response(
+            UpdateMyPageSerializer(instance).data, status=status.HTTP_200_OK
+        )

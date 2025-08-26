@@ -21,9 +21,9 @@ SIMPLE_JWT = {
 CSRF_COOKIE_DOMAIN = "*"
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Cuddle Market API',
-    'DESCRIPTION': 'cuddle market swagger',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
+    "TITLE": "Cuddle Market API",
+    "DESCRIPTION": "cuddle market swagger",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
 }
