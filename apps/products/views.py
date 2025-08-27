@@ -1,3 +1,4 @@
+from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -12,13 +13,11 @@ from .serializers import (
 )
 
 
-class ProductAPIView(APIView):
+class ProductListAPIView(APIView):
     """
     /api/v1/products
     - GET  : 상품 목록 조회
-    - POST : 상품 등록 (로그인 필요)
     """
-
     def get(self, request):
         last_id = request.query_params.get("last_id")
         size = int(request.query_params.get("size", 20))
@@ -32,6 +31,13 @@ class ProductAPIView(APIView):
 
         return Response({"product_list": serializer.data}, status=status.HTTP_200_OK)
 
+
+class ProductCreateAPIView(APIView):
+    """
+    /api/v1/products/create
+    - POST : 상품 등록 (로그인 필요)
+    """
+    parser_classes = [MultiPartParser]
     def post(self, request):
         serializer = ProductCreateSerializer(
             data=request.data, context={"request": request}
