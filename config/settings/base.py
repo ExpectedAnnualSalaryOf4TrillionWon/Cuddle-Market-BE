@@ -31,9 +31,9 @@ if SECRET_KEY is None:
     raise ValueError("DJANGO_SECRET_KEY environment variable is not set.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "corsheaders",
     "channels",
+    "storages",
 ]
 
 DJANGO_APPS = [
@@ -172,7 +173,8 @@ CORS_ALLOW_CREDENTIALS = True  # 쿠키를 포함한 요청 허용
 CORS_ALLOWED_METHODS = ["GET", "POST", "DELETE", "PUT", "PATCH"]
 CORS_ALLOWED_HEADERS = ["Content-Type", "Authorization"]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", f"https://{DOMAIN_NAME}"]
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000",   # Django 서버 (백엔드)
+    "http://localhost:8000", "http://localhost:5173", f"https://{DOMAIN_NAME}"]
 
 
 REDIS_CLIENT = redis.StrictRedis(
@@ -198,3 +200,19 @@ SIMPLE_JWT = {
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
 }
+
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_REGION = os.getenv("AWS_REGION", "ap-northeast-2")
+
+CSRF_COOKIE_SECURE = False        # HTTPS 아니어도 허용
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False      # 자바스크립트 접근 허용 (디버깅용)
+CSRF_COOKIE_SAMESITE = None       # 크로스 도메인 쿠키 허용
+
+# presigned querystring 제거 (URL 깔끔하게)
+AWS_QUERYSTRING_AUTH = False  
+
+# Django가 파일 저장할 때 기본 저장소를 S3로
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
