@@ -50,44 +50,23 @@ class TokenRefreshView(APIView):
         refresh_token = request.COOKIES.get("refresh_token")
         if not refresh_token:
             return Response(
-                {"Refresh token이 제공되지 않았습니다."},
+                {"detail": "Refresh token이 제공되지 않았습니다."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
         try:
             # 기존 리프레쉬 토큰 검증
-            old_refresh = RefreshToken(refresh_token)
-            user_id = old_refresh.payload.get("user_id")
-            user = User.objects.get(id=user_id)
-
-            # 기존 refresh token 블랙리스트 처리
-            old_refresh.blacklist()
-
-            # 새 refresh token 생성
-            new_refresh = RefreshToken.for_user(user)
-            new_access_token = str(new_refresh.access_token)
+            refresh = RefreshToken(refresh_token)
 
             # body 에 access token 만 포함한 응답 생성
-            response = Response({"access": new_access_token}, status=status.HTTP_200_OK)
+            response = Response({"access": str(refresh.access_token)}, status=status.HTTP_200_OK)
 
-            # 새 refresh token 을 쿠키에 설정
-            response.set_cookie(
-                key="refresh_token",
-                value=str(new_refresh),
-                httponly=True,
-                secure=settings.REFRESH_TOKEN_COOKIE_SECURE,
-                samesite="Lax",
-            )
             return response
 
         except TokenError:
             return Response(
-                {"detail": "토큰이 유효하지 않거나 만료되었습니다."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        except User.DoesNotExist:
-            return Response(
-                {"detail": "유저를 찾을 수 없습니다."}, status=status.HTTP_403_FORBIDDEN
+                {"detail": "invalid or exfired refresh token."},
+                status=status.HTTP_401_UNAUTHORIZED
             )
         except Exception:
             # 추후 logger에 저장할 것
