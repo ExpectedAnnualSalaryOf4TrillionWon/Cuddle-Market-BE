@@ -11,6 +11,7 @@ from .serializers import (
     ProductDetailSerializer,
 )
 
+
 class ProductAPIView(APIView):
     """
     /api/v1/products
@@ -48,6 +49,7 @@ class ProductDetailAPIView(APIView):
     상품 상세 조회 API
     GET /api/v1/products/{product_id}/
     """
+
     authentication_classes = []  # 인증 불필요
     permission_classes = []
 

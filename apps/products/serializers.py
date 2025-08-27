@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from django.db import transaction
 from .models import Product, ProductImage
-import uuid, boto3
+import uuid
+import boto3
 from apps.s3_utils import upload_to_s3_and_get_url
 from django.conf import settings
 from apps.likes.models import ProductLike
-from django.db.models import Count
-import os, uuid
+
 
 # ---------------------------------------------------------
 # 상품 이미지 Serializer
@@ -14,7 +14,7 @@ import os, uuid
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ["id", "url", "is_main"]   # 이미지 PK, URL, 대표 여부
+        fields = ["id", "url", "is_main"]  # 이미지 PK, URL, 대표 여부
 
 
 # ---------------------------------------------------------
@@ -33,14 +33,21 @@ class ProductCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            "title", "description", "price",
-            "state_code", "city_code", "category_code",
-            "pet_type_code", "pet_type_detail_code", "condition_status",
-            "main_images", "sub_images",
+            "title",
+            "description",
+            "price",
+            "state_code",
+            "city_code",
+            "category_code",
+            "pet_type_code",
+            "pet_type_detail_code",
+            "condition_status",
+            "main_images",
+            "sub_images",
         ]
 
     def create(self, validated_data):
-        user = self.context["request"].user   # 요청 보낸 사용자
+        user = self.context["request"].user  # 요청 보낸 사용자
         main_files = validated_data.pop("main_images", [])
         sub_files = validated_data.pop("sub_images", [])
 
@@ -51,22 +58,27 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
             #  대표 이미지 필수 조건 체크
             if not main_files:
-                raise serializers.ValidationError({"main_images": "대표 이미지는 최소 1장이 필요합니다."})
+                raise serializers.ValidationError(
+                    {"main_images": "대표 이미지는 최소 1장이 필요합니다."}
+                )
 
             # 대표 이미지 업로드 처리
             for idx, file in enumerate(main_files):
-                object_name = f"products/{user.id}/{uuid.uuid4()}_{file.name}"  # S3에 저장될 경로
+                object_name = (
+                    f"products/{user.id}/{uuid.uuid4()}_{file.name}"  # S3에 저장될 경로
+                )
                 bucket_name = settings.AWS_STORAGE_BUCKET_NAME
-                url = upload_to_s3_and_get_url(file, bucket_name, object_name) # 업로드 후 URL 반환
+                url = upload_to_s3_and_get_url(
+                    file, bucket_name, object_name
+                )  # 업로드 후 URL 반환
                 if not url:
-                    raise serializers.ValidationError({"main_images": "대표 이미지 업로드 실패"})
+                    raise serializers.ValidationError(
+                        {"main_images": "대표 이미지 업로드 실패"}
+                    )
 
                 # DB에 이미지 저장 (첫 번째 이미지는 대표 이미지로 설정)
                 ProductImage.objects.create(
-                    product=product,
-                    url=url,
-                    is_main=(idx == 0),
-                    uploaded_by=user
+                    product=product, url=url, is_main=(idx == 0), uploaded_by=user
                 )
 
             # 서브 이미지 업로드 처리
@@ -75,13 +87,12 @@ class ProductCreateSerializer(serializers.ModelSerializer):
                 bucket_name = settings.AWS_STORAGE_BUCKET_NAME
                 url = upload_to_s3_and_get_url(file, bucket_name, object_name)
                 if not url:
-                    raise serializers.ValidationError({"sub_images": "서브 이미지 업로드 실패"})
+                    raise serializers.ValidationError(
+                        {"sub_images": "서브 이미지 업로드 실패"}
+                    )
 
                 ProductImage.objects.create(
-                    product=product,
-                    url=url,
-                    is_main=False,
-                    uploaded_by=user
+                    product=product, url=url, is_main=False, uploaded_by=user
                 )
 
         return product
@@ -107,22 +118,27 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         )
 
         return f"https://{bucket}.s3.{settings.AWS_REGION}.amazonaws.com/{filename}"
-    
+
 
 # ---------------------------------------------------------
 # 상품 카드용 Serializer (목록 조회에서 사용)
 # ---------------------------------------------------------
 class ProductCardSerializer(serializers.ModelSerializer):
-    thumbnail = serializers.SerializerMethodField()   # 대표 이미지
+    thumbnail = serializers.SerializerMethodField()  # 대표 이미지
     like_count = serializers.SerializerMethodField()  # 좋아요 수
-    elapsed_time = serializers.SerializerMethodField() # 등록 후 경과 시간
+    elapsed_time = serializers.SerializerMethodField()  # 등록 후 경과 시간
 
     class Meta:
         model = Product
         fields = [
-            "id", "thumbnail", "title", "price",
-            "pet_type_code", "condition_status",
-            "transaction_status", "elapsed_time",
+            "id",
+            "thumbnail",
+            "title",
+            "price",
+            "pet_type_code",
+            "condition_status",
+            "transaction_status",
+            "elapsed_time",
             "like_count",
         ]
 
@@ -139,8 +155,9 @@ class ProductCardSerializer(serializers.ModelSerializer):
     def get_elapsed_time(self, obj):
         from django.utils.timesince import timesince
         from django.utils import timezone
+
         return timesince(obj.created_at, timezone.now()) + " 전"
-    
+
 
 # ---------------------------------------------------------
 # 판매자의 다른 상품 Serializer (상품 상세 조회 시 같이 제공)
@@ -152,7 +169,16 @@ class SellerProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "thumbnail", "title", "price", "condition_status", "transaction_status", "elapsed_time", "like_count"]
+        fields = [
+            "id",
+            "thumbnail",
+            "title",
+            "price",
+            "condition_status",
+            "transaction_status",
+            "elapsed_time",
+            "like_count",
+        ]
 
     # 대표 이미지
     def get_thumbnail(self, obj):
@@ -162,6 +188,7 @@ class SellerProductSerializer(serializers.ModelSerializer):
     # 등록 후 경과 시간
     def get_elapsed_time(self, obj):
         from django.utils.timesince import timesince
+
         return timesince(obj.created_at) + " 전"
 
     # 좋아요 수
@@ -173,20 +200,30 @@ class SellerProductSerializer(serializers.ModelSerializer):
 # 상품 상세 페이지 Serializer
 # ---------------------------------------------------------
 class ProductDetailSerializer(serializers.ModelSerializer):
-    images = ProductImageSerializer(many=True, read_only=True)   # 상품 이미지 전체
-    like_count = serializers.SerializerMethodField()             # 좋아요 수
-    seller_info = serializers.SerializerMethodField()            # 판매자 정보
-    seller_products = serializers.SerializerMethodField()        # 판매자의 다른 상품들
+    images = ProductImageSerializer(many=True, read_only=True)  # 상품 이미지 전체
+    like_count = serializers.SerializerMethodField()  # 좋아요 수
+    seller_info = serializers.SerializerMethodField()  # 판매자 정보
+    seller_products = serializers.SerializerMethodField()  # 판매자의 다른 상품들
 
     class Meta:
         model = Product
         fields = [
-            "id", "title", "description", "price",
-            "state_code", "city_code", "category_code",
-            "pet_type_code", "pet_type_detail_code",
-            "transaction_status", "condition_status",
-            "view_count", "like_count", "images",
-            "seller_info", "seller_products",
+            "id",
+            "title",
+            "description",
+            "price",
+            "state_code",
+            "city_code",
+            "category_code",
+            "pet_type_code",
+            "pet_type_detail_code",
+            "transaction_status",
+            "condition_status",
+            "view_count",
+            "like_count",
+            "images",
+            "seller_info",
+            "seller_products",
         ]
 
     # 좋아요 수
