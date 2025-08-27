@@ -1,58 +1,68 @@
-# # from django_filters.rest_framework import DjangoFilterBackend
-# from rest_framework import filters, status, viewsets
-# from rest_framework.decorators import action
-# from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-# from rest_framework.response import Response
-# from datetime import timezone
-# from .models import Product, ProductImage
-# from .serializers import (
-#     ProductSerializer,
-# )
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django.db.models import F
+from .models import Product
+from .serializers import (
+    ProductCreateSerializer,
+    ProductCardSerializer,
+    ProductDetailSerializer,
+)
 
 
-# class ProductViewSet(viewsets.ModelViewSet):
-#     queryset = Product.objects.filter(is_deleted=False).order_by("-created_at")
-#     serializer_class = ProductSerializer
-#     permission_classes = [IsAuthenticatedOrReadOnly]
+class ProductAPIView(APIView):
+    """
+    /api/v1/products
+    - GET  : 상품 목록 조회
+    - POST : 상품 등록 (로그인 필요)
+    """
 
-#     filter_backends = [
-#         # DjangoFilterBackend,
-#         filters.SearchFilter,
-#         filters.OrderingFilter,
-#     ]
-#     filterset_fields = ["category", "status", "method", "location"]
-#     search_fields = ["title", "description"]
-#     ordering_fields = ["created_at", "price", "like_count"]
+    def get(self, request):
+        last_id = request.query_params.get("last_id")
+        size = int(request.query_params.get("size", 20))
 
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
+        queryset = Product.objects.prefetch_related("images").order_by("-id")
+        if last_id:
+            queryset = queryset.filter(id__lt=last_id)
 
-#     def perform_destroy(self, instance):
-#         # 소프트 삭제 처리
-#         instance.is_deleted = True
-#         instance.deleted_at = timezone.now()
-#         instance.save()
+        products = queryset[:size]
+        serializer = ProductCardSerializer(products, many=True)
 
-#     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-#     def like(self, request, pk=None):
-#         product = self.get_object()
-#         user = request.user
-#         liked, created = ProductLike.objects.get_or_create(user=user, product=product)
-#         if not created:
-#             liked.delete()
-#             return Response({"detail": "Like removed"}, status=status.HTTP_200_OK)
-#         return Response({"detail": "Product liked"}, status=status.HTTP_201_CREATED)
+        return Response({"product_list": serializer.data}, status=status.HTTP_200_OK)
 
-#     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-#     def upload_images(self, request, pk=None):
-#         product = self.get_object()
-#         files = request.FILES.getlist("images")
-#         # 이미지 검증 (형식, 크기) 로직 필요
-#         # 이미지 업로드 및 순서 지정 처리 필요
-#         # 예시로 기존 이미지 삭제 후 재등록 로직 작성 가능
-#         product.productimage_set.all().delete()
-#         for idx, file in enumerate(files):
-#             ProductImage.objects.create(
-#                 product=product, image_url=file, image_order=idx
-#             )
-#         return Response({"detail": "Images uploaded"}, status=status.HTTP_201_CREATED)
+    def post(self, request):
+        serializer = ProductCreateSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        with transaction.atomic():
+            serializer.save()
+
+        return Response({"message": "상품 등록 완료"}, status=status.HTTP_201_CREATED)
+
+
+class ProductDetailAPIView(APIView):
+    """
+    상품 상세 조회 API
+    GET /api/v1/products/{product_id}/
+    """
+
+    authentication_classes = []  # 인증 불필요
+    permission_classes = []
+
+    def get(self, request, product_id):
+        # 상품 + 이미지 같이 가져오기
+        product = get_object_or_404(
+            Product.objects.prefetch_related("images"), id=product_id
+        )
+
+        # 조회수 증가 (동시성 안전)
+        product.view_count = F("view_count") + 1
+        product.save(update_fields=["view_count"])
+        product.refresh_from_db(fields=["view_count"])
+
+        serializer = ProductDetailSerializer(product, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
