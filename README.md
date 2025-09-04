@@ -6,4 +6,4 @@
 내 아이를 위한 소중한 마음과 추억이 또 다른 사랑으로 나누어지는 Cuddle Maket입니다.
 
 # 기술스택
-Django, DRF, 웹소켓, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker, Daphne, GitHub, Swager
+Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker, Daphne, GitHub, Swager
