@@ -19,6 +19,29 @@
 실시간 채팅: 구매자–판매자 1:1 채팅, 채팅방 생성/삭제, 메시지 송수신(WebSocket)
 
 # 기술스택
+## 사용 스택
+
+### 🔧 System Architecture
+
+//
+
+### FE
+
+<div align="center">
+<img align="center" src="https://img.shields.io/badge/HTML5-FE642E?style=flat-square&logo=html5&logoColor=white"/>
+<img align="center" src="https://img.shields.io/badge/CSS3-2E9AFE?style=flat-square&logo=CSS3&logoColor=white"/>
+<img align="center" src="https://img.shields.io/badge/Javascript-f7df1e?style=flat-square&logo=Javascript&logoColor=black"/><br>
+<img align="center" src="https://img.shields.io/badge/React-2E2E2E?style=flat-square&logo=React&logoColor=61dafb"/>
+<img align="center" src="https://img.shields.io/badge/TypeScript-3178c6?style=flat-square&logo=TypeScript&logoColor=white"/>
+<img align="center" src="https://img.shields.io/badge/figma-A259FF?style=flat-square&logo=figma&logoColor=fff
+"/><br>
+<img align="center" src="https://img.shields.io/badge/prettier-61e1e6?style=flat-square&logo=prettier&logoColor=magenta"/>
+<img align="center" src="https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwind-css&logoColor=fff"/>
+<img align="center" src="https://img.shields.io/badge/zustand-lightgray?style=flat-square"/>
+<img align="center" src="https://img.shields.io/badge/npm-%23CB3837?style=flat-square&logo=npm"/>
+</div>
+
+### BE
 Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker, Daphne, GitHub, Swager
 
 ## Team
