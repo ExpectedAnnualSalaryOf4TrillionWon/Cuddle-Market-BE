@@ -69,75 +69,45 @@ Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker
 </tbody>
 </table>
 <br>
+# 프로젝트 구조
+
+```bash
 CUDDLE-MARKET-BE/
-<br>
 ├── .github/                 # GitHub 설정
-<br>
 ├── .idea/                   # IDE 관련 설정 (PyCharm 등)
-<br>
 ├── .ruff_cache/             # Ruff linter 캐시
-<br>
 ├── .venv/                   # 가상환경
-<br>
 ├── apps/                    # Django 앱 모음
-<br>
 │   ├── categories/          # 카테고리 관련 앱
-<br>
 │   ├── chats/               # 채팅 기능 앱
-<br>
 │   ├── likes/               # 좋아요(찜) 기능 앱
-<br>
 │   ├── products/            # 상품 관련 앱
-<br>
 │   ├── users/               # 사용자 관리 앱
-<br>
 │   ├── __pycache__/         
-<br>
 │   ├── __init__.py
-<br>
 │   └── s3_utils.py          # S3 업로드 유틸
-<br>
 ├── certbot/                 # 인증서 관련 설정
-<br>
 ├── config/                  # Django 프로젝트 설정
-<br>
 │   ├── settings/            # 환경별 세팅 (dev, prod 등)
-<br>
 │   │   └── __init__.py
-<br>
 │   ├── asgi.py
-<br>
 │   ├── urls.py
-<br>
 │   └── wsgi.py
-<br>
-├──  resources/               # 프로젝트 리소스
-<br>
+├── resources/               # 프로젝트 리소스
 ├── staticfiles/             # 정적 파일
-<br>
 ├── .dockerignore
-<br>
 ├── .env                     # 환경 변수 파일
-<br>
 ├── .gitignore
-<br>
 ├── .python-version          # Python 버전 관리
-<br>
 ├── docker-compose-dev.yml   # 개발 환경 Docker Compose
-<br>
 ├── docker-compose.yml       # 기본 Docker Compose
-<br>
 ├── Dockerfile               # Docker 이미지 빌드 설정
-<br>
 ├── manage.py                # Django 명령어 실행 진입점
-<br>
 ├── pyproject.toml           # Python 패키지 설정 (uv/poetry)
-<br>
 ├── README.md
-<br>
 ├── test.sh                  # 테스트 실행용 스크립트
-<br>
 └── uv.lock                  # uv 의존성 lock 파일
+```
 <br>
 Document
 <br>
