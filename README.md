@@ -1,6 +1,7 @@
 <img width="1960" height="980" alt="image" src="https://github.com/user-attachments/assets/b847a58c-af7c-4b1c-b5e1-fe3ffe875750" />
 <br>
-# 프로젝트 소개
+
+#  프로젝트 소개
 <br>
 - Cuddle Market
 반려동물들과 함께하는 사람이 많은 요즘, 반려동물 용품을 새로 구매하는 것이 가격이 비싸 부담스럽기도 하고, 수명이 짧게 사용되고 흥미를 잃거나 선호도에 따라 버려지는 것이 아까운 모든 반려인들을 위해 Cuddle Maket이 개발되었습니다.
@@ -92,7 +93,8 @@ Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker
 </tbody>
 </table>
 <br>
-# 프로젝트 구조
+
+#  프로젝트 구조
 
 ```bash
 CUDDLE-MARKET-BE/
@@ -134,5 +136,5 @@ CUDDLE-MARKET-BE/
 <br>
 Document
 <br>
-<a href="https://www.notion.so/23fcaf5650aa812d887ccbf811a4208c?v=23fcaf5650aa810995e7000c7a32a853&source=copy_link">요구사항 정의서</a><br> > <a href="">플로우 차트</a><br> > <a href="">와이어프레임</a><br> > <a href="">화면정의서</a><br> > <a href="https://dbdiagram.io/d/Copy-of-Copy-of-%EC%95%A0%EC%99%84%EB%8F%99%EB%AC%BC-%EC%A4%91%EA%B3%A0%EB%A7%88%EC%BC%93-ERD-689c9a3b1d75ee360a6f743a">ERD 문서</a><br> > <a href="https://docs.google.com/spreadsheets/d/12iKca5DBOynjGHntoxBUpVeOxhgDCU8V7FaVWBBDrTw/edit?gid=0#gid=0">테이블 명세서 문서</a><br> > <a href="">API 문서</a><br>
+> <a href="https://www.notion.so/23fcaf5650aa812d887ccbf811a4208c?v=23fcaf5650aa810995e7000c7a32a853&source=copy_link">요구사항 정의서</a><br> > <a href="">플로우 차트</a><br> > <a href="">와이어프레임</a><br> > <a href="">화면정의서</a><br> > <a href="https://dbdiagram.io/d/Copy-of-Copy-of-%EC%95%A0%EC%99%84%EB%8F%99%EB%AC%BC-%EC%A4%91%EA%B3%A0%EB%A7%88%EC%BC%93-ERD-689c9a3b1d75ee360a6f743a">ERD 문서</a><br> > <a href="https://docs.google.com/spreadsheets/d/12iKca5DBOynjGHntoxBUpVeOxhgDCU8V7FaVWBBDrTw/edit?gid=0#gid=0">테이블 명세서 문서</a><br> > <a href="">API 문서</a><br>
 <br>
