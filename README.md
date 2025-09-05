@@ -1,4 +1,5 @@
 <img width="1960" height="980" alt="image" src="https://github.com/user-attachments/assets/b847a58c-af7c-4b1c-b5e1-fe3ffe875750" />
+<br>
 # 프로젝트 소개
 <br>
 - Cuddle Market
@@ -7,3 +8,126 @@
 
 # 기술스택
 Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker, Daphne, GitHub, Swager
+
+## Team
+
+<table align="center">
+<thead>
+<tr>
+<th align="center"><a href="https://github.com/Dayeon-00"><img src="https://img.shields.io/badge/github-Dayeon-blue?style=for-the-badge&logo=github&logoColor=%23fff&labelColor=%23181717" width="100px/" style="max-width: 100%;"></a><br></th>
+<th align="center"><a href="https://github.com/jjub0217"><img src="https://img.shields.io/badge/github-jjub0217-blue?style=for-the-badge&logo=github&logoColor=%23fff&labelColor=%23181717" width="100px/" style="max-width: 100%;"></a><br></th>
+<th align="center"><a href="https://github.com/minjekim64"><img src="https://img.shields.io/badge/github-minjekim64-blue?style=for-the-badge&logo=github&logoColor=%23fff&labelColor=%23181717" width="100px/" style="max-width: 100%;"></a><br></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">총 팀장<br>(BackEnd 팀장)</td> 
+<td align="center">부 팀장<br>(FrontEnd 팀장)</td>
+<td align="center">팀원<br>(FrontEnd)</td>
+
+</tr>
+<tr>
+<td align="center">권다연</td>
+<td align="center">강주현</td>
+<td align="center">김민제</td>
+
+</tr>
+</tbody>
+</table>
+<table align="center">
+<thead>
+<tr>
+<th align="center"><a href="https://github.com/dirage1"><img src="https://img.shields.io/badge/github-dirage1-blue?style=for-the-badge&logo=github&logoColor=%23fff&labelColor=%23181717" width="100px/" style="max-width: 100%;"></a><br></th>
+<th align="center"><a href="https://github.com/ParkKangbin"><img src="https://img.shields.io/badge/github-ParkKangbin-blue?style=for-the-badge&logo=github&logoColor=%23fff&labelColor=%23181717" width="100px/" style="max-width: 100%;"></a><br></th>
+<th align="center"><a href="https://github.com/ark2313"><img src="https://img.shields.io/badge/github-ark2313-blue?style=for-the-badge&logo=github&logoColor=%23fff&labelColor=%23181717" width="100px/" style="max-width: 100%;"></a><br></th>
+
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">팀원<br>(FrontEnd)</td>
+<td align="center">팀원<br>(BackEnd)</td>
+<td align="center">팀원<br>(BackEnd)</td>
+</tr>
+<tr>
+<td align="center">김승원</td>
+<td align="center">박강빈</td>
+<td align="center">이상민</td>
+</tr>
+</tbody>
+</table>
+<br>
+CUDDLE-MARKET-BE/
+<br>
+├── .github/                 # GitHub 설정
+<br>
+├── .idea/                   # IDE 관련 설정 (PyCharm 등)
+<br>
+├── .ruff_cache/             # Ruff linter 캐시
+<br>
+├── .venv/                   # 가상환경
+<br>
+├── apps/                    # Django 앱 모음
+<br>
+│   ├── categories/          # 카테고리 관련 앱
+<br>
+│   ├── chats/               # 채팅 기능 앱
+<br>
+│   ├── likes/               # 좋아요(찜) 기능 앱
+<br>
+│   ├── products/            # 상품 관련 앱
+<br>
+│   ├── users/               # 사용자 관리 앱
+<br>
+│   ├── __pycache__/         
+<br>
+│   ├── __init__.py
+<br>
+│   └── s3_utils.py          # S3 업로드 유틸
+<br>
+├── certbot/                 # 인증서 관련 설정
+<br>
+├── config/                  # Django 프로젝트 설정
+<br>
+│   ├── settings/            # 환경별 세팅 (dev, prod 등)
+<br>
+│   │   └── __init__.py
+<br>
+│   ├── asgi.py
+<br>
+│   ├── urls.py
+<br>
+│   └── wsgi.py
+<br>
+├──  resources/               # 프로젝트 리소스
+<br>
+├── staticfiles/             # 정적 파일
+<br>
+├── .dockerignore
+<br>
+├── .env                     # 환경 변수 파일
+<br>
+├── .gitignore
+<br>
+├── .python-version          # Python 버전 관리
+<br>
+├── docker-compose-dev.yml   # 개발 환경 Docker Compose
+<br>
+├── docker-compose.yml       # 기본 Docker Compose
+<br>
+├── Dockerfile               # Docker 이미지 빌드 설정
+<br>
+├── manage.py                # Django 명령어 실행 진입점
+<br>
+├── pyproject.toml           # Python 패키지 설정 (uv/poetry)
+<br>
+├── README.md
+<br>
+├── test.sh                  # 테스트 실행용 스크립트
+<br>
+└── uv.lock                  # uv 의존성 lock 파일
+<br>
+Document
+<br>
+<a href="https://www.notion.so/23fcaf5650aa812d887ccbf811a4208c?v=23fcaf5650aa810995e7000c7a32a853&source=copy_link">요구사항 정의서</a><br> > <a href="https://dbdiagram.io/d/Copy-of-Copy-of-%EC%95%A0%EC%99%84%EB%8F%99%EB%AC%BC-%EC%A4%91%EA%B3%A0%EB%A7%88%EC%BC%93-ERD-689c9a3b1d75ee360a6f743a">ERD 문서</a><br> > <a href="https://docs.google.com/spreadsheets/d/12iKca5DBOynjGHntoxBUpVeOxhgDCU8V7FaVWBBDrTw/edit?gid=0#gid=0">테이블 명세서 문서</a><br> > <a href="">API 문서</a><br>
+<br>
