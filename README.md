@@ -39,6 +39,9 @@
 
 실시간 채팅: 구매자–판매자 1:1 채팅, 채팅방 생성/삭제, 메시지 송수신(WebSocket)
 
+# 배포링크
+https://cuddle-market-fe.vercel.app/
+
 # 기술스택
 ## 사용 스택
 
