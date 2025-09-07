@@ -194,7 +194,11 @@ CUDDLE-MARKET-BE/
 <summary>사용자 요구사항 정의서</summary>
 <div markdown="1">
 
-사진
+<img width="1342" height="867" alt="image" src="https://github.com/user-attachments/assets/f671f60a-f2ba-4525-a58d-d651433646e9" />
+<img width="1327" height="888" alt="image" src="https://github.com/user-attachments/assets/b6ed201e-bf22-4c76-8374-1eaa5e3d2537" />
+<img width="1338" height="851" alt="image" src="https://github.com/user-attachments/assets/2901cb4f-4f35-4b35-a11c-567f76e0f671" />
+<img width="1340" height="877" alt="image" src="https://github.com/user-attachments/assets/ccb17b5b-cc63-4f8f-b99b-d9c1c25461f1" />
+
 
 </div>
 </details>
