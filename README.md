@@ -49,7 +49,7 @@ https://cuddle-market-fe.vercel.app/
 
 //
 
-### FE
+# FE
 
 <div align="center">
 <img align="center" src="https://img.shields.io/badge/HTML5-FE642E?style=flat-square&logo=html5&logoColor=white"/>
@@ -65,7 +65,7 @@ https://cuddle-market-fe.vercel.app/
 <img align="center" src="https://img.shields.io/badge/npm-%23CB3837?style=flat-square&logo=npm"/>
 </div>
 
-### BE
+# BE
 Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker, Daphne, GitHub, Swager
 
 ## Team
@@ -117,7 +117,7 @@ Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker
 </table>
 <br>
 
-📌 팀 컨벤션
+# 📌 팀 컨벤션
 🗓 일정
 데일리 스크럼 : 매일 오전 10시 20분
 
@@ -186,7 +186,7 @@ CUDDLE-MARKET-BE/
 └── uv.lock                  # uv 의존성 lock 파일
 ```
 <br>
-Document
+# Document
 <br>
 > <a href="https://www.notion.so/23fcaf5650aa812d887ccbf811a4208c?v=23fcaf5650aa810995e7000c7a32a853&source=copy_link">요구사항 정의서</a><br> > <a href="">플로우 차트</a><br> > <a href="">와이어프레임</a><br> > <a href="">화면정의서</a><br> > <a href="https://dbdiagram.io/d/Copy-of-Copy-of-%EC%95%A0%EC%99%84%EB%8F%99%EB%AC%BC-%EC%A4%91%EA%B3%A0%EB%A7%88%EC%BC%93-ERD-689c9a3b1d75ee360a6f743a">ERD 문서</a><br> > <a href="https://docs.google.com/spreadsheets/d/12iKca5DBOynjGHntoxBUpVeOxhgDCU8V7FaVWBBDrTw/edit?gid=0#gid=0">테이블 명세서 문서</a><br> > <a href="">API 문서</a><br>
 <br>
