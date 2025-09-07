@@ -139,6 +139,9 @@ Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker
 커밋타입: 커밋메세지
 ( 예시: Fix: 기본 CRUD 기능 작성 )
 
+# ERD
+<img width="1112" height="806" alt="image" src="https://github.com/user-attachments/assets/1ac48ff1-bfe8-4cb9-bb67-cd4c88eac7f2" />
+
 
 #  프로젝트 구조
 
