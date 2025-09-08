@@ -1,6 +1,29 @@
-# CUDDLE MARKET
+<img width="1960" height="980" alt="image" src="https://github.com/user-attachments/assets/b847a58c-af7c-4b1c-b5e1-fe3ffe875750" />
+<br>
 
-## 프로젝트 소개
+📋 목차
+
+1. 프로젝트 소개
+
+2. 배포 링크
+
+3. 기능 요약
+
+4. 파이널 웹뷰
+
+5. 기술 스택 소개
+
+6. 팀 소개
+
+7. 팀 컴벤션
+
+8. ERD
+
+9. 프로젝트 구조
+
+10. Document
+
+# 프로젝트 소개
 
 <div> 
 <img  alt="Image" src="https://github.com/user-attachments/assets/6ea2172e-9a39-454d-8e13-461cc12dc075" /> </div>
@@ -25,7 +48,21 @@
 
 **CUDDLE MARKET에 오신 것을 환영합니다!**
 
+# 배포링크
+
 <a href="https://cuddle-market-fe.vercel.app/">👉 cuddle market 바로가기</a>
+
+# 📌 주요 기능 (요약 버전)
+
+회원 관리: 이메일 회원가입/로그인, 카카오 소셜 로그인, 마이페이지, 회원 탈퇴
+
+상품 관리: 상품 등록/수정/삭제, 다중 이미지 업로드(S3), 거래 상태 변경
+
+검색 & 필터: 통합 검색, 카테고리/반려동물 타입 필터, 최신순·인기순 정렬
+
+관심 상품(찜): 상품 찜 등록/취소, 찜 개수 조회, 내 관심목록 관리
+
+실시간 채팅: 구매자–판매자 1:1 채팅, 채팅방 생성/삭제, 메시지 송수신(WebSocket)
 
 ## Final Web View
 
@@ -114,11 +151,15 @@
 </tbody>
 </table>
 
+# 기술스택
+
 ## 사용 스택
 
 ### 🔧 System Architecture
 
-### FE
+//
+
+# FE
 
 <div>
 <img align="center" src="https://img.shields.io/badge/HTML5-FE642E?style=flat-square&logo=html5&logoColor=white"/>
@@ -134,7 +175,7 @@
 <img align="center" src="https://img.shields.io/badge/npm-%23CB3837?style=flat-square&logo=npm"/>
 </div>
 
-### BE
+# BE
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django-092E20?style=flat&logo=django&logoColor=white)
@@ -198,14 +239,83 @@
 </tr>
 </tbody>
 </table>
+<br>
 
-## Document
+# 📌 팀 컨벤션
 
-<a href="https://github.com/ExpectedAnnualSalaryOf4TrillionWon/Cuddle-Market-FE/wiki/Flow-Chart">플로우 차트</a><br>
-<a href="https://github.com/ExpectedAnnualSalaryOf4TrillionWon/Cuddle-Market-FE/wiki/Wire-Frame">와이어프레임</a><br>
-<a href="https://github.com/ExpectedAnnualSalaryOf4TrillionWon/Cuddle-Market-FE/wiki/Prototype">화면정의서</a><br>
-<a href="https://dbdiagram.io/d/Copy-of-Copy-of-%EC%95%A0%EC%99%84%EB%8F%99%EB%AC%BC-%EC%A4%91%EA%B3%A0%EB%A7%88%EC%BC%93-ERD-689c9a3b1d75ee360a6f743a">ERD 문서</a><br>
-<a href="https://docs.google.com/spreadsheets/d/12iKca5DBOynjGHntoxBUpVeOxhgDCU8V7FaVWBBDrTw/edit?gid=0#gid=0">테이블 명세서 문서</a><br>
+🗓 일정
+데일리 스크럼 : 매일 오전 10시 20분
+
+코어 타임 : 아침 10:00 ~ 오후 06:40
+
+휴식은 10분씩.
+
+📣 의사소통 규칙
+
+화나면 용용 체 쓰기
+
+화내지 않기
+
+어려움은 바로바로 얘기해주기(혼자 힘들어하지 말기)
+
+###개발규칙
+
+1일 1PR + 머지 (진행도와 충돌 여부 확인 목적)
+
+커밋타입의 첫글자는 대문자로 작성합니다.
+
+커밋타입: 커밋메세지
+( 예시: Fix: 기본 CRUD 기능 작성 )
+
+# ERD
+
+<img width="1112" height="806" alt="image" src="https://github.com/user-attachments/assets/1ac48ff1-bfe8-4cb9-bb67-cd4c88eac7f2" />
+
+# 프로젝트 구조
+
+```bash
+CUDDLE-MARKET-BE/
+├── .github/                 # GitHub 설정
+├── .idea/                   # IDE 관련 설정 (PyCharm 등)
+├── .ruff_cache/             # Ruff linter 캐시
+├── .venv/                   # 가상환경
+├── apps/                    # Django 앱 모음
+│   ├── categories/          # 카테고리 관련 앱
+│   ├── chats/               # 채팅 기능 앱
+│   ├── likes/               # 좋아요(찜) 기능 앱
+│   ├── products/            # 상품 관련 앱
+│   ├── users/               # 사용자 관리 앱
+│   ├── __pycache__/
+│   ├── __init__.py
+│   └── s3_utils.py          # S3 업로드 유틸
+├── certbot/                 # 인증서 관련 설정
+├── config/                  # Django 프로젝트 설정
+│   ├── settings/            # 환경별 세팅 (dev, prod 등)
+│   │   └── __init__.py
+│   ├── asgi.py
+│   ├── urls.py
+│   └── wsgi.py
+├── resources/               # 프로젝트 리소스
+├── staticfiles/             # 정적 파일
+├── .dockerignore
+├── .env                     # 환경 변수 파일
+├── .gitignore
+├── .python-version          # Python 버전 관리
+├── docker-compose-dev.yml   # 개발 환경 Docker Compose
+├── docker-compose.yml       # 기본 Docker Compose
+├── Dockerfile               # Docker 이미지 빌드 설정
+├── manage.py                # Django 명령어 실행 진입점
+├── pyproject.toml           # Python 패키지 설정 (uv/poetry)
+├── README.md
+├── test.sh                  # 테스트 실행용 스크립트
+└── uv.lock                  # uv 의존성 lock 파일
+```
+
+<br>
+
+# Document
+
+> <a href="https://www.figma.com/design/KzCKMJ5edFNKsj0IbB3pnk/커들마켓-와이어프레임?node-id=158-2357&p=f&t=rJWfgPTkGh9rREMi-0">플로우 차트</a><br> > <a href="https://www.figma.com/design/KzCKMJ5edFNKsj0IbB3pnk/커들마켓-와이어프레임?node-id=0-1&p=f&t=rJWfgPTkGh9rREMi-0">와이어프레임</a><br> > <a href="https://www.figma.com/design/KzCKMJ5edFNKsj0IbB3pnk/커들마켓-와이어프레임?node-id=158-4&t=rJWfgPTkGh9rREMi-1">화면정의서</a><br> > <a href="https://dbdiagram.io/d/Copy-of-Copy-of-%EC%95%A0%EC%99%84%EB%8F%99%EB%AC%BC-%EC%A4%91%EA%B3%A0%EB%A7%88%EC%BC%93-ERD-689c9a3b1d75ee360a6f743a">ERD 문서</a><br> > <a href="https://docs.google.com/spreadsheets/d/12iKca5DBOynjGHntoxBUpVeOxhgDCU8V7FaVWBBDrTw/edit?gid=0#gid=0">테이블 명세서 문서</a><br> > <br>
 
 <details>
 <summary>API 문서</summary>
@@ -975,8 +1085,3 @@
 
 </div>
 </details>
-<a href="https://github.com/ExpectedAnnualSalaryOf4TrillionWon/Cuddle-Market-FE/wiki/Requirements">요구사항 정의서 링크</a><br>
-
-## More Info
-
-<a href="https://github.com/ExpectedAnnualSalaryOf4TrillionWon/Cuddle-Market-BE">🔐 Cuddle market Server Repository</a><br>
