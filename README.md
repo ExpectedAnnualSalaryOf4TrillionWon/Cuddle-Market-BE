@@ -1,5 +1,4 @@
-<img width="1960" height="980" alt="image" src="https://github.com/user-attachments/assets/b847a58c-af7c-4b1c-b5e1-fe3ffe875750" />
-<br>
+
 
 📋 목차
 
@@ -157,7 +156,7 @@
 
 ### 🔧 System Architecture
 
-//
+
 
 # FE
 
