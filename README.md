@@ -51,7 +51,7 @@ https://cuddle-market-fe.vercel.app/
 
 # FE
 
-<div align="center">
+<div>
 <img align="center" src="https://img.shields.io/badge/HTML5-FE642E?style=flat-square&logo=html5&logoColor=white"/>
 <img align="center" src="https://img.shields.io/badge/CSS3-2E9AFE?style=flat-square&logo=CSS3&logoColor=white"/>
 <img align="center" src="https://img.shields.io/badge/Javascript-f7df1e?style=flat-square&logo=Javascript&logoColor=black"/><br>
@@ -70,7 +70,7 @@ Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker
 
 ## Team
 
-<table align="center">
+<table>
 <thead>
 <tr>
 <th align="center"><a href="https://github.com/Dayeon-00"><img src="https://img.shields.io/badge/github-Dayeon-blue?style=for-the-badge&logo=github&logoColor=%23fff&labelColor=%23181717" width="100px/" style="max-width: 100%;"></a><br></th>
@@ -93,7 +93,7 @@ Django, DRF, WebSocket, Postman, RDS, EC2, S3, python, Postgresql, Redis, Docker
 </tr>
 </tbody>
 </table>
-<table align="center">
+<table>
 <thead>
 <tr>
 <th align="center"><a href="https://github.com/dirage1"><img src="https://img.shields.io/badge/github-dirage1-blue?style=for-the-badge&logo=github&logoColor=%23fff&labelColor=%23181717" width="100px/" style="max-width: 100%;"></a><br></th>
