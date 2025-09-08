@@ -186,6 +186,7 @@ CUDDLE-MARKET-BE/
 └── uv.lock                  # uv 의존성 lock 파일
 ```
 <br>
+
 # Document
 
 > <a href="https://www.figma.com/design/KzCKMJ5edFNKsj0IbB3pnk/커들마켓-와이어프레임?node-id=158-2357&p=f&t=rJWfgPTkGh9rREMi-0">플로우 차트</a><br> 
