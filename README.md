@@ -250,13 +250,22 @@ CUDDLE-MARKET-BE/
 {
   "access_token": "jwt_access_token",
   "refresh_token": "jwt_refresh_token",
-  "user": {
-    "email": "user@example.com",
-    "nickname": "닉네임",
-    "profile_image": "https://example.com/profile.jpg",
-    "state": "서울",
-	  "city": "강남구",
-    "created_at": "2025-01-01T00:00:00"
+"user":{
+  "id": 1,
+  "provider": "kakao",
+  "email": "user@example.com",
+  "name": "홍길동",
+  "nickname": "길동이",
+  "profile_image": "https://example.com/profile.jpg",
+  "birthday": "1998-01-01",
+  "is_active": true,
+  "is_staff": false,
+  "is_superuser": false,
+  "profile_completed": true,
+  "last_login": "2025-09-08T12:34:56Z",
+  "created_at": "2025-09-01T09:30:00Z",
+  "state_name": "서울특별시",
+  "city_name": "강남구",
   }
 }
 
