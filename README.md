@@ -190,6 +190,801 @@ CUDDLE-MARKET-BE/
 <br>
 <br> > <a href="https://www.figma.com/design/KzCKMJ5edFNKsj0IbB3pnk/커들마켓-와이어프레임?node-id=158-2357&p=f&t=rJWfgPTkGh9rREMi-0">플로우 차트</a><br> > <a href="https://www.figma.com/design/KzCKMJ5edFNKsj0IbB3pnk/커들마켓-와이어프레임?node-id=0-1&p=f&t=rJWfgPTkGh9rREMi-0">와이어프레임</a><br> > <a href="https://www.figma.com/design/KzCKMJ5edFNKsj0IbB3pnk/커들마켓-와이어프레임?node-id=158-4&t=rJWfgPTkGh9rREMi-1">화면정의서</a><br> > <a href="https://dbdiagram.io/d/Copy-of-Copy-of-%EC%95%A0%EC%99%84%EB%8F%99%EB%AC%BC-%EC%A4%91%EA%B3%A0%EB%A7%88%EC%BC%93-ERD-689c9a3b1d75ee360a6f743a">ERD 문서</a><br> > <a href="https://docs.google.com/spreadsheets/d/12iKca5DBOynjGHntoxBUpVeOxhgDCU8V7FaVWBBDrTw/edit?gid=0#gid=0">테이블 명세서 문서</a><br> > <a href="https://api.umdoong.shop/docs/#/">API 문서</a><br>
 <br>
+
+<details>
+<summary>API 문서</summary>
+<div markdown="1">
+
+| 기능 (FR) | HTTP 메서드 | 엔드포인트 | 인증 | 설명 |
+| --- | --- | --- | --- | --- |
+| **FR-001** | `POST` | `/api/v1/auth/social/kakao` | ❌ | 소셜 로그인 / 회원가입 |
+| **FR-002** | `GET` | `/api/v1/users/mypage` | ✅ | 마이페이지 조회 |
+| **FR-003** | `PATCH`  | `/api/v1/users/mypage/profile` | ✅ | 프로필 정보 수정 |
+| **FR-004** | `DELETE` | `/api/v1/users/withdraw` | ✅ | 회원 탈퇴 |
+| **FR-005** | `POST` | `/api/v1/auth/logout` | ✅ | 로그아웃 |
+| **FR-006** | `POST` | `/api/v1/products` | ✅ | 상품 등록 |
+| **FR-007** | `GET` | `/api/v1/products` | ❌ | 메인 페이지 상품 게시글 목록 조회 |
+| **FR-008** | `GET` | `/api/v1/products/{product_id}` | ❌ | 상품 상세 조회 |
+| **FR-009** | `PATCH` | `/api/v1/products/{product_id}` | ✅ | 상품 수정(제목, 거래상태 등) |
+| **FR-010** | `DELETE` | `/api/v1/products/{product_id}` | ✅ | 상품 삭제 |
+| **FR-010-1** | `PATCH` | `/api/v1/products/{product_id}/status` | ✅ | 거래 상태 변경 |
+| **FR-011** | `GET` | `/api/v1/products/search` | ❌ | 통합 검색(필터링, 정렬) |
+| **FR-012** | `POST` | `/api/v1/likes` | ✅ | 관심 목록 추가 |
+| **FR-013** | `DELETE` | `/api/v1/likes` | ✅ | 관심 목록 삭제 |
+| **FR-014** | `GET` | `/api/v1/likes` | ✅ | 관심 목록 조회 |
+| **FR-015** | `GET` | `/api/v1/chatrooms` | ✅ | 채팅방 목록 |
+| **FR-016** | `POST` | `/api/v1/chatrooms` | ✅ | 채팅방 생성 |
+| **FR-017** | `DELETE` | `/api/v1/chatrooms/{chatroom_id}` | ✅ | 채팅방 삭제 |
+| **FR-018** | `POST` | `/api/v1/chatrooms/{chatroom_id}/messages` | ✅ | 채팅 전송 |
+| **FR-019** | `GET` | `/api/v1/chatrooms/{chatroom_id}/messages` | ✅ | 채팅 내역 조회 |
+| **FR-020** | `GET` | `/api/v1/notifications` | ✅ | 알림 기능 |
+| FR-021 | `GET` | `/api/v1/users/profile` | ✅ | 유저 프로필 조회 |
+| FR-023 | `GET` | `/api/v1/categories/` | ❌ | 카테고리 필터링 |
+| FR-024 | `GET` | `/api/v1/categories/filters/` | ✅ | 서브 필터 |
+| FR-025 | `GET` | `/api/v1/products/my-products/` |  | 내가 등록한 상품 목록 |
+| FR-026 | `GET` | `/api/v1/products/{product_id}/view-count` | ❌ | 상품 조회수 조회 |
+
+### 2. 엔드포인트 상세 명세
+
+### 2.1 소셜 로그인 / 회원가입
+
+`POST` `/api/v1/auth/social/kakao` — ❌ *(인증 불필요)*
+
+**Path Params**
+
+- `provider` *(string, 필수)* — `google`, `kakao`, `naver` 중 하나
+
+**Request Body** ✅
+
+```json
+
+{
+  "code": "소셜로그인_인가코드"
+}
+
+```
+
+**응답 예시 (200 OK)**
+
+```json
+{
+  "access_token": "jwt_access_token",
+  "refresh_token": "jwt_refresh_token",
+  "user": {
+    "email": "user@example.com",
+    "nickname": "닉네임",
+    "profile_image": "https://example.com/profile.jpg",
+    "state": "서울",
+	  "city": "강남구",
+    "created_at": "2025-01-01T00:00:00"
+  }
+}
+
+```
+
+---
+
+### 2.2 마이페이지 조회
+
+`GET` `/api/v1/users/mypage` — ✅ *(인증 필요)*
+
+**Request Body** ❌
+
+**Query Params** ❌
+
+**응답 예시 (200 OK)**
+
+```json
+{
+  "my_product_list": [
+		  {
+		  "title": "제목",
+		  "price": "123.00",
+		  "transaction_status": "판매중",
+		  "view_count": 123,
+		  "main_image": "url"
+		  },
+		  {"title": "제목2", ...}
+	],
+  "liked_product_list": [
+		  {
+		  "title": "제목",
+		  "price": "123.00",
+		  "transaction_status": "판매중",
+		  "view_count": 123,
+		  "main_image": "url"
+		  },
+		  {"title": "제목2", ...}
+	]
+}
+
+```
+
+---
+
+### 2.2.1 유저페이지 조회
+
+`GET` `/api/v1/users/profile` — ✅ *(인증 필요)*
+
+**Request Body** ❌
+
+**Query Params** ❌
+
+**응답 예시 (200 OK)**
+
+```json
+{
+	  "id": 1,
+    "nickname": "닉네임",
+    "profile_image": "https://example.com/profile.jpg",
+    "state": "서울",
+	  "city": "강남구",
+    "created_at": "2025-01-01T00:00:00"
+}
+```
+
+---
+
+### 2.3 프로필 정보 수정
+
+`PATCH` `/api/v1/users/mypage/profile` — ✅ *(인증 필요)*
+
+**Request Body** ✅
+
+```json
+
+{
+  "nickname": "새닉네임",
+  "profile_image": "https://example.com/new_image.jpg",
+  "state": "서울",
+  "city": "강남구"
+}
+
+```
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "message": "프로필 정보가 수정되었습니다."
+}
+
+```
+
+---
+
+### 2.4 회원 탈퇴
+
+`DELETE` `/api/v1/users/withdraw` — ✅ *(인증 필요)*
+
+**Request Body** ❌
+
+**Query Params** ❌
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "message": "회원 탈퇴 완료"
+}
+
+```
+
+---
+
+### 2.5 로그아웃
+
+`POST` `/api/v1/auth/logout` — ✅ *(인증 필요)*
+
+**Request Body** ✅
+
+```json
+
+{
+  "refresh_token": "리프레시토큰값"
+}
+
+```
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "message": "로그아웃 완료"
+}
+
+```
+
+---
+
+### 2.6 상품 등록
+
+`POST` `/api/v1/products` — ✅ *(인증 필요)*
+
+**Request Body** ✅
+
+```json
+{
+  "title": "강아지 장난감",
+  "description": "강아지가 좋아해요",
+  "price": 15000.00,
+  "images": {
+		  "main": "https://example.com/image1.jpg",
+			"sub": ["1번사진url", "2번사진url"]	  
+	},
+	"state_code": "서울특별시",
+	"city_code": "강남구",
+	"category_code": "사료/간식",
+	"pet_type_code": "포유류",
+	"pet_type_detail_code": "강아지",
+	"condition_status": "새 것"
+}
+```
+
+**응답 예시 (201 Created)**
+
+```json
+{
+  "message": "상품 등록 완료"
+}
+```
+
+---
+
+### 2.7 메인 페이지 상품 게시글 목록 조회
+
+`GET` `/api/v1/products` — ❌ *(인증 불필요)*
+
+**Query Params** 
+
+`last_id`  (string, 최초 외에 필수)
+
+`size` (int, 필수, 기본값20)
+
+**응답 예시 (200 OK)**
+
+```json
+{
+  "product_list": [
+    {
+      "id": 1,
+      "thumbnail": "https://s3.amazonaws.com/bucket/products/1.jpg",
+      "title": "강아지 장난감",
+      "price": 15000,
+      "pet_type_code": "강아지",
+      "condition_status": "거의 새것",
+      "transaction_status": "판매중",
+      "elapsed_time": "2시간 전",
+      "like_count": 12
+    }
+  ]
+}
+
+```
+
+---
+
+### 2.8 상품 상세 조회
+
+`GET` `/api/v1/products/{product_id}` — ❌ *(인증 불필요)*
+
+**Path Params**
+
+- `product_id` *(integer, 필수)*
+
+**응답 예시 (200 OK)**
+
+```json
+{
+  		"id": 1,
+		  "title": "강아지 장난감",
+		  "description": "강아지가 좋아해요",
+		  "price": 15000.00,
+		  "images": "https://example.com/image1.jpg",
+			"state_code": "서울특별시",
+			"city_code": "서초구",
+			"category_code": "사료/간식",
+			"pet_type_code": "포유류",
+			"pet_type_detail_code": "강아지",
+			"transaction_status": "판매중",
+			"condition_status": "새 것",
+			"view_count": 1234,
+			"like_count": 123,
+			"seller_info": {
+							"id": 1,
+							"seller_images": "https:example.com/image3.jpg",
+							"nickname": "홍길동",
+							"state": "서울특별시",
+							"city": "서초구"
+			},
+			"seller_products":[
+			{
+			 "id":123,
+			 "thumbnail": "https:example.com/image3.jpg",
+			 "PetTypeDetail": "강아지",
+       "condition": "거의 새것",
+       "transaction_status": "판매중",
+			 "title": "상품 제목",
+			 "price":20000,
+			 "elapsed_time": "2025-08-08T13:20:00",
+			 "like_count":5
+			}				
+		]
+	}
+
+```
+
+---
+
+### 2.9 상품 수정
+
+`PATCH` `/api/v1/products/{product_id}` — ✅ *(인증 필요)*
+
+**Path Params**
+
+- `product_id` *(integer, 필수)*
+
+**Request Body** ✅
+
+```json
+
+{
+	"id": 123,
+	"pet_type_id": 3,
+	"pet_type_name": "강아지",
+	"category_id":5,
+	"category_name":"사료"
+  "title": "수정된 상품명",
+  "description": "설명 수정",
+  "price": 20000,
+	"condition_status":"MINT",
+	"images":[
+	"https://example.com/images1.jpg",
+	"https://example.com/images1.jpg"
+	],
+	"state_id": 1,
+	"state_name": "서울특별시"
+	"city_id":12,
+	"city_name": "강남구"
+	
+  }
+
+```
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "message": "상품 정보가 수정되었습니다."
+}
+
+```
+
+### 2.10-1 거래 상태 변경
+
+`PATCH` `/api/v1/products/{product_id}/status` — ✅ *(인증 필요)*
+
+**Path Params**
+
+- `product_id` *(integer, 필수)*
+
+**Request Body** ✅
+
+```json
+
+{
+  "transaction_status": "SOLD"
+}
+
+```
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "product_id": 1,
+  "transaction_status": "SOLD",
+  "message": "거래 상태가 변경되었습니다."
+}
+
+```
+
+---
+
+### 2.11 상품 삭제
+
+`DELETE` `/api/v1/products/{product_id}` — ✅ *(인증 필요)*
+
+**Path Params**
+
+- `product_id` *(integer, 필수)*
+
+**Request Body** ❌
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "message": "상품 삭제 완료",
+  "deleted_product_id": 101
+}
+
+```
+
+---
+
+### 2.12 통합 검색
+
+`GET` `/api/v1/products/search` — ❌ *(인증 불필요)*
+
+**Query Params** ✅
+
+- `keyword` *(string, 필수)*
+
+**응답 예시 (200 OK)**
+
+```json
+
+[
+  {
+    "id": 1,
+    "thumbnail": "string(url)",
+    "PetTypeDetail": "강아지",
+    "condition": "거의 새것",
+    "transaction_status": "판매중"
+    "title": "강아지 장난감",
+    "price": 15000,
+    "created_at": "2025-08-13T10:32:00",
+    "like_count": 15
+  }
+]
+
+```
+
+---
+
+### 2.13 카테고리 필터링
+
+`GET` `/api/v1/categories/` — ❌ *(인증 불필요)*
+
+**Request Body** ❌
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "id": 1,
+  "name": "포유류",
+  "code": "MAMMAL",
+  "children": [
+    {
+      "id": 10,
+      "name": "강아지",
+      "code": "DOG",
+      "children": [
+        { "id": 101, "name": "사료/간식", "code": "FOOD" },
+        { "id": 102, "name": "장난감", "code": "TOY" },
+        { "id": 103, "name": "사육장/하우스", "code": "CAGE" }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "고양이",
+      "code": "CAT",
+      "children": [
+        { "id": 104, "name": "사료/간식", "code": "FOOD" },
+        { "id": 105, "name": "캣타워", "code": "TOWER" }
+      ]
+    }
+  ]
+}
+
+```
+
+---
+
+### 2.14 서브 필터
+
+`GET` `/api/v1/categories/filter` — ❌ *(인증 불필요)*
+
+**Query Params** *(선택)*
+
+- `price_min` *(integer)*
+- `price_max` *(integer)*
+- `state` *(string)*
+- `city` *(string)*
+
+**응답 예시 (200 OK)**
+
+```json
+
+[
+  {
+    "id": 1,
+    "title": "고양이 사료",
+    "price": 12000,
+    "thumbnail": "https://example.com/image.jpg", //“필터링 걸쳐져서 대표 상품 이미지 URL
+    "state": "서울특별시",
+    "city": "강남구"
+  }
+]
+
+```
+
+---
+
+### 2.15 관심 목록 추가
+
+`POST` `/api/v1/likes/` — ✅ *(인증 필요)*
+
+**Request Body** ✅
+
+```json
+
+{
+  "product_id": 1
+}
+
+```
+
+**응답 예시 (201 Created)**
+
+```json
+
+{
+  "message": "관심 목록에 추가되었습니다."
+  "product_id": 1,
+  "is_liked": true
+}
+
+```
+
+---
+
+### 2.16 관심 목록 삭제
+
+`DELETE` `/api/v1/likes/` — ✅ *(인증 필요)*
+
+**Request Body** ✅
+
+```json
+
+{
+  "product_id": 1
+}
+
+```
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "message": "관심 목록에서 삭제되었습니다.",
+  "product_id": 1,
+  "is_liked": false
+}
+
+```
+
+---
+
+### 2.17 관심 목록 조회
+
+`GET` `/api/v1/likes/` — ✅ *(인증 필요)*
+
+**Request Body** ❌
+
+**응답 예시 (200 OK)**
+
+```json
+[
+  {
+    "product_id": 1,
+    "title": "강아지 장난감",
+    "price": 15000,
+    "thumbnail": "https://example.com/image.jpg",
+    "view_count": 3,
+    "transaction_status": "SELLING
+  }
+]
+
+```
+
+---
+
+### 2.19 채팅방 목록 조회
+
+`GET` `/api/v1/chatrooms` — ✅ *(인증 필요)*
+
+**Query Params** *(선택)*
+
+- `page` *(integer)* — 기본값 1
+- `page_size` *(integer)* — 기본값 20
+
+**응답 예시 (200 OK)**
+
+```json
+[
+  {
+    "partner_nickname": "고양이파",  # 상대방 닉네임
+    "product_image": "https://example.com/image.jpg", 
+    "product_title": "강아지 장난감",
+    "product_price": 15000,
+    "last_message": "안녕하세요!",
+    "last_message_time": "2025-08-13T10:32:00"
+  }
+]
+
+```
+
+---
+
+### 2.20 채팅방 생성
+
+`POST` `/api/v1/chatrooms/` — ✅ *(인증 필요)*
+
+**Request Body** ✅
+
+```json
+
+{
+	"buyer_id" : 1, 
+  "product_id": 1,
+  "seller_id": 2
+}
+
+```
+
+**응답 예시 (201 Created)**
+
+```json
+
+{
+  "chatroom_id": 12,
+  "message": "채팅방이 생성되었습니다."
+}
+
+```
+
+---
+
+### 2.21 채팅 전송
+
+`POST` `/api/v1/chatrooms/{chatroom_id}/messages/` — ✅ *(인증 필요)*
+
+**Path Params**
+
+- `chatroom_id` *(integer, 필수)*
+
+**Request Body** ✅
+
+```json
+
+{
+  "content": "안녕하세요!",
+}
+
+```
+
+**응답 예시 (201 Created)**
+
+```json
+
+{
+  "message": "메시지 전송 완료"
+}
+
+```
+
+---
+
+### 2.22 채팅방 삭제
+
+`DELETE` `/api/v1/chatrooms/{chatroom_id}` — ✅ *(인증 필요)*
+
+**Path Params**
+
+- `chatroom_id` *(integer, 필수)*
+
+**Request Body** ❌
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "message": "채팅방이 삭제되었습니다.",
+}
+
+```
+
+---
+
+### 2.23 채팅 내역 조회
+
+`GET` `/api/v1/chatrooms/{chatroom_id}/messages/` — ✅ *(인증 필요)*
+
+**Path Params**
+
+- `chatroom_id` *(integer, 필수)*
+
+**Query Params** *(선택)*
+
+- `page` *(integer)* — 기본값 1
+- `page_size` *(integer)* — 기본값 50
+
+**응답 예시 (200 OK)**
+
+```json
+{
+  "messages": [
+    {
+      "sender_nickname": "강아지사랑",
+      "message": "안녕하세요!"
+    },
+    {
+      "sender_nickname": "고양이파",
+      "message": "반갑습니다!"
+    }
+  ]
+
+```
+
+---
+
+### 2.24 알림 기능
+
+`GET` `/api/v1/notifications` — ✅ *(인증 필요)*
+
+**Query Params** *(선택)*
+
+- `is_read` *(boolean)* — 읽음 여부 필터
+
+**응답 예시 (200 OK)**
+
+```json
+
+[
+  {
+    "id": 123,
+    "type": "CHAT",
+    "message": "새로운 채팅 메시지가 도착했습니다.",
+  }
+]
+
+```
+
+---
+
+### 2.26 상품 조회수 조회
+
+`GET` `/api/v1/products/{product_id}/view-count` — ❌ *(인증 불필요)*
+
+**Path Params**
+
+- `product_id` *(integer, 필수)*
+
+**응답 예시 (200 OK)**
+
+```json
+
+{
+  "product_id": 1,
+  "view_count": 152
+}
+
+```
+</div>
+</details>
+
 <details>
 <summary>사용자 요구사항 정의서</summary>
 <div markdown="1">
